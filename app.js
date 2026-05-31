@@ -32,7 +32,6 @@ const fmtDate = str => {
 };
 const DAYS_SHORT = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 const DAY_INDEXES = [1, 2, 3, 4, 5, 6, 0];
-const MONTH_RU = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
 const SUBJECTS = ['История', 'Общество', 'Русский', 'Математика', 'Английский', 'Другое'];
 const inferSubject = (text = '') => {
   const t = text.toLowerCase();
@@ -893,19 +892,6 @@ const IcoRepeat = p => _jsxs(Ico, {
   }), _jsx("path", {
     d: "M21 13v2a4 4 0 0 1-4 4H3"
   })]
-});
-const IcoStar = p => _jsx(Ico, {
-  ...p,
-  children: _jsx("path", {
-    d: "m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"
-  })
-});
-const IcoLoader = p => _jsx(Ico, {
-  ...p,
-  children: _jsx("path", {
-    d: "M21 12a9 9 0 1 1-6.2-8.6",
-    cls: "spin"
-  })
 });
 const IcoSearch = p => _jsxs(Ico, {
   ...p,
@@ -4688,36 +4674,6 @@ function App() {
       if (notify) alert('Не удалось создать локальную копию.');
       return false;
     }
-  };
-  const importJson = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        try {
-          const data = JSON.parse(ev.target.result);
-          if (!data.students || !data.lessons) {
-            alert('Файл не распознан — нет данных об учениках или уроках');
-            return;
-          }
-          const date = data.exportedAt ? new Date(data.exportedAt).toLocaleString('ru-RU') : 'неизвестная дата';
-          if (!confirm(`Загрузить бэкап от ${date}?\n\nТекущие данные будут полностью заменены.`)) return;
-          setStudents(data.students || []);
-          setGroups(data.groups || []);
-          setLessons(data.lessons || []);
-          setTxs(data.txs || []);
-          if (data.settings) setSettings(data.settings);
-        } catch {
-          alert('Не удалось прочитать файл — возможно, он повреждён.');
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
   };
   const importFullJson = () => {
     const input = document.createElement('input');
