@@ -493,6 +493,25 @@ const getLessonStudents = (lesson, students, groups, opts = {}) => {
   const list = lesson.type === 'individual' ? [students.find(s => s.id === lesson.targetId)].filter(Boolean) : group?.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean) || [];
   return opts.includeArchived ? list : list.filter(s => !s.archived);
 };
+const omitRecordKey = (record, key) => {
+  if (!record || typeof record !== 'object' || !(key in record)) return record;
+  const next = {
+    ...record
+  };
+  delete next[key];
+  return next;
+};
+const stripStudentFromLesson = (lesson, studentId) => {
+  const key = String(studentId);
+  const nextAttendance = omitRecordKey(lesson.attendance, key);
+  const nextPackageUse = omitRecordKey(lesson.packageUse, key);
+  if (nextAttendance === lesson.attendance && nextPackageUse === lesson.packageUse) return lesson;
+  return {
+    ...lesson,
+    attendance: nextAttendance,
+    packageUse: nextPackageUse
+  };
+};
 const getLessonRate = (lesson, student, groups) => {
   const group = lesson.type === 'group' ? groups.find(g => g.id === lesson.targetId) : null;
   const groupOverride = group?.rateOverrides?.[student.id];
@@ -640,6 +659,28 @@ const timeToMin = time => {
   return (h || 0) * 60 + (m || 0);
 };
 const minToTime = min => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
+const dateMs = date => new Date(`${date}T00:00:00`).getTime();
+const dateDiffDays = (from, to) => Math.round((dateMs(to) - dateMs(from)) / 86400000);
+const shiftDate = (date, days) => {
+  const d = new Date(`${date}T00:00:00`);
+  d.setDate(d.getDate() + days);
+  return localDateString(d);
+};
+const lessonDateTimeKey = lesson => `${lesson?.date || '0000-00-00'}T${lesson?.time || '00:00'}`;
+const sameSeriesSlot = (lesson, source) => {
+  if (!lesson?.seriesId || !source?.seriesId || lesson.seriesId !== source.seriesId) return false;
+  const lessonDay = new Date(`${lesson.date}T00:00:00`).getDay();
+  const sourceDay = new Date(`${source.date}T00:00:00`).getDay();
+  return lesson.time === source.time && lessonDay === sourceDay;
+};
+const sameRecurringSlot = (lesson, source) => {
+  if (!lesson || !source) return false;
+  if (sameSeriesSlot(lesson, source)) return true;
+  if (lesson.seriesId || source.seriesId) return false;
+  const lessonDay = new Date(`${lesson.date}T00:00:00`).getDay();
+  const sourceDay = new Date(`${source.date}T00:00:00`).getDay();
+  return lesson.type === source.type && lesson.targetId === source.targetId && lesson.time === source.time && lessonDay === sourceDay;
+};
 const lessonRange = lesson => {
   const start = timeToMin(lesson.time);
   return {
@@ -1985,11 +2026,12 @@ function LessonModal({
     d.setDate(d.getDate() + 28);
     return localDateString(d);
   });
-  const [applySeries, setApplySeries] = useState(false);
+  const [seriesScope, setSeriesScope] = useState('single');
   const [topic, setTopic] = useState(lessonToEdit?.topic || '');
   const [homework, setHomework] = useState(lessonToEdit?.homework || '');
   const [lessonNote, setLessonNote] = useState(lessonToEdit?.lessonNote || '');
   const [duration, setDuration] = useState(lessonToEdit?.duration || 60);
+  const canApplyFuture = lessonToEdit?.status === 'planned' && lessons.filter(l => sameRecurringSlot(l, lessonToEdit) && l.status === 'planned' && lessonDateTimeKey(l) >= lessonDateTimeKey(lessonToEdit)).length > 1;
   const activeGroups = groups.filter(g => !g.archived || lessonToEdit?.targetId === g.id);
   const activeStudents = students.filter(s => !s.archived || lessonToEdit?.targetId === s.id || initialStudentId === s.id);
   const dayFreeSlots = useMemo(() => {
@@ -2060,7 +2102,7 @@ function LessonModal({
         ...base,
         date
       }], {
-        applySeries
+        seriesScope
       });
       return;
     }
@@ -2326,19 +2368,27 @@ function LessonModal({
             children: "\u0432\u043A\u043B."
           })]
         })]
-      }), lessonToEdit?.seriesId && _jsxs("div", {
-        className: `check-row ${applySeries ? 'checked' : ''}`,
-        onClick: () => setApplySeries(!applySeries),
-        children: [_jsx("span", {
-          style: {
-            fontWeight: 700
-          },
-          children: "\u041F\u0440\u0438\u043C\u0435\u043D\u0438\u0442\u044C \u0432\u0440\u0435\u043C\u044F/\u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u043E\u0432 \u043A\u043E \u0432\u0441\u0435\u0439 \u0441\u0435\u0440\u0438\u0438"
+      }), canApplyFuture && _jsxs("div", {
+        className: "series-scope-panel",
+        children: [_jsx("div", {
+          className: "label",
+          children: "Применить изменения"
+        }), _jsxs("div", {
+          className: "toggle-row",
+          children: [_jsx("button", {
+            type: "button",
+            className: `toggle-opt ${seriesScope === 'single' ? 'active' : ''}`,
+            onClick: () => setSeriesScope('single'),
+            children: "Только этот урок"
+          }), _jsx("button", {
+            type: "button",
+            className: `toggle-opt ${seriesScope === 'future' ? 'active' : ''}`,
+            onClick: () => setSeriesScope('future'),
+            children: "Этот и следующие"
+          })]
         }), _jsx("div", {
-          className: `check-box ${applySeries ? 'checked' : ''}`,
-          children: applySeries && _jsx(IcoCheck, {
-            size: 14
-          })
+          className: "series-scope-hint",
+          children: "Прошлые и проведённые занятия не изменятся."
         })]
       }), _jsxs("div", {
         className: "modal-actions",
@@ -2565,6 +2615,43 @@ function LessonStatusModal({
         className: "btn btn-full btn-black",
         onClick: e => onDelete(lesson.id, e),
         children: "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0437\u0430\u043D\u044F\u0442\u0438\u0435"
+      })]
+    })]
+  });
+}
+function LessonDeleteModal({
+  lesson,
+  onClose,
+  onDeleteOne,
+  onDeleteFuture
+}) {
+  return _jsxs(Modal, {
+    title: "Удалить занятие",
+    onClose: onClose,
+    children: [_jsxs("div", {
+      className: "series-delete-note",
+      children: [_jsx("b", {
+        children: "Это регулярное занятие."
+      }), _jsx("span", {
+        children: "Прошлые и проведённые уроки не изменятся."
+      })]
+    }), _jsxs("div", {
+      className: "modal-actions vertical",
+      children: [_jsx("button", {
+        type: "button",
+        className: "btn btn-white btn-full",
+        onClick: e => onDeleteOne(lesson.id, e),
+        children: `Только ${fmtDate(lesson.date)}`
+      }), _jsx("button", {
+        type: "button",
+        className: "btn btn-red btn-full",
+        onClick: e => onDeleteFuture(lesson.id, e),
+        children: `${fmtDate(lesson.date)} и следующие`
+      }), _jsx("button", {
+        type: "button",
+        className: "btn btn-black btn-full",
+        onClick: onClose,
+        children: "Не удалять"
       })]
     })]
   });
@@ -4263,6 +4350,37 @@ function App() {
     ...student,
     rate: getLessonRate(lesson, student, groups)
   }));
+  const removeLessonFinanceEffects = (baseStudents, baseTxs, deletedLessons) => {
+    let nextStudents = baseStudents;
+    let nextTxs = baseTxs;
+    deletedLessons.forEach(lesson => {
+      const attendanceState = financeCore.removeLessonTransactionsState({
+        students: nextStudents,
+        txs: nextTxs,
+        lessonId: lesson.id,
+        kind: 'attendance',
+        packageUse: lesson.packageUse
+      });
+      nextStudents = attendanceState.students;
+      nextTxs = attendanceState.txs;
+      const noShowState = financeCore.removeLessonTransactionsState({
+        students: nextStudents,
+        txs: nextTxs,
+        lessonId: lesson.id,
+        kind: 'no_show'
+      });
+      nextStudents = noShowState.students;
+      nextTxs = noShowState.txs;
+    });
+    return {
+      students: nextStudents,
+      txs: nextTxs
+    };
+  };
+  const getSeriesFutureSlotLessons = source => {
+    if (!source) return [];
+    return lessons.filter(l => sameRecurringSlot(l, source) && l.status === 'planned' && lessonDateTimeKey(l) >= lessonDateTimeKey(source));
+  };
   const saveStudent = data => {
     const edit = modal?.payload;
     if (edit) setStudents(p => p.map(s => s.id === edit.id ? {
@@ -4291,17 +4409,24 @@ function App() {
       snapT = [...txs],
       snapG = [...groups];
     const student = students.find(s => s.id === id);
+    const deletedLessons = lessons.filter(l => l.type === 'individual' && l.targetId === id);
+    const cleanedFinance = removeLessonFinanceEffects(students, txs, deletedLessons);
+    const nextLessons = lessons.filter(l => !(l.type === 'individual' && l.targetId === id)).map(l => l.type === 'group' ? stripStudentFromLesson(l, id) : l);
+    const nextGroups = groups.map(g => ({
+      ...g,
+      studentIds: g.studentIds.filter(x => x !== id),
+      rateOverrides: omitRecordKey(g.rateOverrides, id)
+    }));
     recordDeletion(`Ученик ${student?.name || ''}`.trim(), () => {
       setLessons(snapL);
       setStudents(snapS);
       setTxs(snapT);
       setGroups(snapG);
     });
-    setStudents(p => p.filter(s => s.id !== id));
-    setGroups(p => p.map(g => ({
-      ...g,
-      studentIds: g.studentIds.filter(x => x !== id)
-    })));
+    setStudents(cleanedFinance.students.filter(s => s.id !== id));
+    setGroups(nextGroups);
+    setLessons(nextLessons);
+    setTxs(cleanedFinance.txs.filter(tx => tx.studentId !== id));
     triggerUndo(`${student?.name || 'Ученик'} удалён`, snapL, snapS, snapT, snapG);
   };
   const saveGroup = data => {
@@ -4316,16 +4441,24 @@ function App() {
     setModal(null);
   };
   const delGroup = id => {
-    const snapG = [...groups];
+    const snapL = [...lessons],
+      snapS = [...students],
+      snapT = [...txs],
+      snapG = [...groups];
     const group = groups.find(g => g.id === id);
-    recordDeletion(`Группа ${group?.name || ''}`.trim(), () => setGroups(snapG));
-    setGroups(p => p.filter(g => g.id !== id));
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    setPendingUndo({
-      label: 'Группа удалена',
-      restore: () => setGroups(snapG)
+    const deletedLessons = lessons.filter(l => l.type === 'group' && l.targetId === id);
+    const cleanedFinance = removeLessonFinanceEffects(students, txs, deletedLessons);
+    recordDeletion(`Группа ${group?.name || ''}`.trim(), () => {
+      setLessons(snapL);
+      setStudents(snapS);
+      setTxs(snapT);
+      setGroups(snapG);
     });
-    undoTimerRef.current = setTimeout(() => setPendingUndo(null), 4000);
+    setGroups(groups.filter(g => g.id !== id));
+    setLessons(lessons.filter(l => !(l.type === 'group' && l.targetId === id)));
+    setStudents(cleanedFinance.students);
+    setTxs(cleanedFinance.txs);
+    triggerUndo('Группа удалена', snapL, snapS, snapT, snapG);
   };
   const saveTx = data => {
     const edit = modal?.type === 'transaction' && modal?.payload?.id ? modal?.payload : null;
@@ -4357,36 +4490,34 @@ function App() {
     setTxs(nextState.txs);
     triggerUndo('РћРїРµСЂР°С†РёСЏ СѓРґР°Р»РµРЅР°', lessons, snapS, snapT);
   };
-  const confirmLessonConflicts = (items, ignoreId = null) => {
+  const confirmLessonConflicts = (items, ignoreIds = null) => {
     const arr = Array.isArray(items) ? items : [items];
-    const conflicts = arr.flatMap(item => findLessonConflicts(item, lessons, students, groups, ignoreId));
+    const ignoreSet = new Set(Array.isArray(ignoreIds) ? ignoreIds : ignoreIds !== null && ignoreIds !== undefined ? [ignoreIds] : []);
+    const sourceLessons = ignoreSet.size ? lessons.filter(l => !ignoreSet.has(l.id)) : lessons;
+    const conflicts = arr.flatMap(item => findLessonConflicts(item, sourceLessons, students, groups, null));
     const unique = [...new Map(conflicts.map(l => [l.id, l])).values()];
     if (!unique.length) return true;
     return confirm(`Есть конфликт расписания:\n\n${conflictText(unique, groups, students)}\n\nВсе равно сохранить?`);
   };
   const saveLesson = (data, editId = null, options = {}) => {
-    if (!confirmLessonConflicts(data, editId)) return;
     if (editId) {
       const editLesson = lessons.find(l => l.id === editId);
       const patch = data[0];
-      setLessons(p => p.map(l => {
-        if (l.id === editId) return {
-          ...l,
-          ...patch
-        };
-        if (options.applySeries && editLesson?.seriesId && l.seriesId === editLesson.seriesId && l.status === 'planned') {
-          return {
-            ...l,
-            type: patch.type,
-            targetId: patch.targetId,
-            subject: patch.subject,
-            time: patch.time
-          };
-        }
-        return l;
+      if (!editLesson) return;
+      const scope = options.seriesScope === 'future' && editLesson.status === 'planned' ? 'future' : 'single';
+      const dateShiftDays = dateDiffDays(editLesson.date, patch.date);
+      const affected = scope === 'future' ? getSeriesFutureSlotLessons(editLesson) : [editLesson];
+      const changed = affected.map(l => ({
+        ...l,
+        ...patch,
+        date: l.id === editId ? patch.date : shiftDate(l.date, dateShiftDays)
       }));
+      if (!confirmLessonConflicts(changed, affected.map(l => l.id))) return;
+      const changedById = new Map(changed.map(l => [l.id, l]));
+      setLessons(p => p.map(l => changedById.get(l.id) || l));
     } else {
       const arr = Array.isArray(data) ? data : [data];
+      if (!confirmLessonConflicts(arr)) return;
       setLessons(p => [...p, ...arr.map((l, i) => ({
         ...l,
         id: Date.now() + i,
@@ -4475,6 +4606,47 @@ function App() {
     setLessons(p => p.filter(l => l.id !== id));
     setModal(null);
     triggerUndo('Занятие удалено', snapL, snapS, snapT);
+  };
+  const delFutureSeriesLessons = (id, e) => {
+    if (e) e.stopPropagation();
+    const lesson = lessons.find(l => l.id === id);
+    if (!lesson?.seriesId) {
+      delLesson(id, e);
+      return;
+    }
+    const targets = getSeriesFutureSlotLessons(lesson);
+    const targetIds = new Set(targets.map(l => l.id));
+    if (!targetIds.size) return;
+    const snapL = [...lessons],
+      snapS = [...students],
+      snapT = [...txs];
+    const label = `Занятия с ${fmtDate(lesson.date)} удалены`;
+    recordDeletion(label, () => {
+      setLessons(snapL);
+      setStudents(snapS);
+      setTxs(snapT);
+    });
+    const cleanedFinance = removeLessonFinanceEffects(students, txs, targets);
+    setLessons(lessons.filter(l => !targetIds.has(l.id)));
+    setStudents(cleanedFinance.students);
+    setTxs(cleanedFinance.txs);
+    setModal(null);
+    triggerUndo(label, snapL, snapS, snapT);
+  };
+  const requestDeleteLesson = (lessonOrId, e) => {
+    if (e) e.stopPropagation();
+    const lesson = typeof lessonOrId === 'object' ? lessonOrId : lessons.find(l => l.id === lessonOrId);
+    if (!lesson) return;
+    if (lesson.status === 'planned' && getSeriesFutureSlotLessons(lesson).length > 1) {
+      setModal({
+        type: 'lessonDelete',
+        payload: {
+          lesson
+        }
+      });
+      return;
+    }
+    delLesson(lesson.id, e);
   };
   const chargeNoShow = lesson => {
     const nextState = financeCore.chargeNoShowState({
@@ -5139,7 +5311,7 @@ function App() {
           type: 'lessonStatus',
           payload: l
         }),
-        onDelete: e => delLesson(l.id, e)
+        onDelete: e => requestDeleteLesson(l, e)
       }, l.id)), (() => {
         const upcoming = [];
         for (let i = 1; i < 7; i++) {
@@ -5203,7 +5375,7 @@ function App() {
                 type: 'lessonStatus',
                 payload: l
               }),
-              onDelete: e => delLesson(l.id, e)
+              onDelete: e => requestDeleteLesson(l, e)
             }, l.id))]
           }, date))]
         });
@@ -5245,11 +5417,6 @@ function App() {
       });
       const swipeRef = useSwipe(() => setWeekOffset(w => w + 1), () => setWeekOffset(w => w - 1));
 
-      // Mobile: selected day within week
-      const [mobileDay, setMobileDay] = useState(() => {
-        const todayIdx = weekDates.indexOf(today);
-        return todayIdx >= 0 ? todayIdx : 0;
-      });
       const weekDaySummaries = weekDates.map((d, i) => ({
         date: d,
         index: i,
@@ -5257,6 +5424,7 @@ function App() {
         isToday: d === today,
         lessons: scheduleLessons.filter(l => l.date === d).sort((a, b) => a.time.localeCompare(b.time))
       }));
+      const mobileDay = Math.max(0, weekDates.indexOf(weekDates.includes(selDate) ? selDate : weekDates.includes(today) ? today : weekDates[0]));
       const mobileDayData = weekDaySummaries[mobileDay] || weekDaySummaries[0];
       const mobileDayLessons = mobileDayData?.lessons || [];
       const mobileMarkers = l => {
@@ -5304,7 +5472,7 @@ function App() {
               children: weekDaySummaries.map(day => _jsxs("button", {
                 type: "button",
                 className: `mobile-week-strip-day ${mobileDay === day.index ? 'selected' : ''} ${day.isToday ? 'today' : ''} ${day.lessons.length > 3 ? 'dense' : ''}`,
-                onClick: () => setMobileDay(day.index),
+                onClick: () => setSelDate(day.date),
                 children: [_jsx("span", {
                   children: DAY_LABELS[day.index]
                 }), _jsx("strong", {
@@ -5455,6 +5623,14 @@ function App() {
                           });
                         },
                         children: _jsx(IcoEdit, {
+                          size: 14
+                        })
+                      }), _jsx("button", {
+                        type: "button",
+                        className: "mobile-agenda-icon danger",
+                        title: "Удалить",
+                        onClick: e => requestDeleteLesson(l, e),
+                        children: _jsx(IcoTrash, {
                           size: 14
                         })
                       })]
@@ -5684,7 +5860,7 @@ function App() {
                     lesson: l
                   }
                 }),
-                onDelete: e => delLesson(l.id, e)
+                onDelete: e => requestDeleteLesson(l, e)
               }, l.id))
             })]
           });
@@ -5955,7 +6131,7 @@ function App() {
               type: "button",
               className: "month-agenda-action danger",
               title: "Удалить",
-              onClick: e => delLesson(l.id, e),
+              onClick: e => requestDeleteLesson(l, e),
               children: _jsx(IcoTrash, {
                 size: 15
               })
@@ -8413,13 +8589,18 @@ function App() {
       lesson: modal.payload,
       onClose: () => setModal(null),
       onStatus: setLessonStatus,
-      onDelete: delLesson,
+      onDelete: requestDeleteLesson,
       onReschedule: lesson => setModal({
         type: 'reschedule',
         payload: {
           lesson
         }
       })
+    }), modal?.type === 'lessonDelete' && _jsx(LessonDeleteModal, {
+      lesson: modal.payload.lesson,
+      onClose: () => setModal(null),
+      onDeleteOne: delLesson,
+      onDeleteFuture: delFutureSeriesLessons
     }), modal?.type === 'package' && _jsx(PackageModal, {
       student: modal.payload.student,
       onClose: () => setModal(null),
