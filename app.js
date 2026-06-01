@@ -51,6 +51,25 @@ const subjectColor = subject => ({
   'Другое': '#6f7378'
 })[subject] || '#777';
 const subjectTagText = () => '#fff';
+const DEFAULT_RATE = 1500;
+const sameId = (a, b) => a != null && b != null && String(a) === String(b);
+const normalizeMoneyInput = (value, fallback = DEFAULT_RATE) => {
+  if (String(value ?? '').trim() === '') return fallback;
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? n : fallback;
+};
+const GROUP_EMOJIS = ['📚', '✏️', '🎯', '🧠', '⚡', '🏛️', '🚀', '⭐', '🌿', '🔥'];
+const randomGroupEmoji = () => GROUP_EMOJIS[Math.floor(Math.random() * GROUP_EMOJIS.length)];
+const firstNameLetter = name => String(name || '').trim().charAt(0).toUpperCase();
+const buildGroupAutoName = (ids = [], students = [], subject = 'Группа') => {
+  const initials = ids.map(id => students.find(s => sameId(s.id, id))).filter(Boolean).map(s => firstNameLetter(s.name)).filter(Boolean).join('');
+  return initials || subject || 'Группа';
+};
+const getGroupDisplayName = (group, students = []) => {
+  if (!group) return '?';
+  const name = String(group.name || '').trim();
+  return name || buildGroupAutoName(group.studentIds || [], students, group.subject);
+};
 
 // ── AUTO-COMPLETE ──────────────────────────────────────────────────────────────
 const runAutoCompletion = (cls, cst, cg, ctx) => {
@@ -64,8 +83,8 @@ const runAutoCompletion = (cls, cst, cg, ctx) => {
     end.setHours(end.getHours() + 1);
     if (lesson.status === 'planned' && end <= now) {
       updated = true;
-      const grp = lesson.type === 'group' ? cg.find(g => g.id === lesson.targetId) : null;
-      const lsStudents = lesson.type === 'individual' ? [newS.find(s => s.id === lesson.targetId)].filter(Boolean) : grp?.studentIds.map(id => newS.find(s => s.id === id)).filter(Boolean) || [];
+      const grp = lesson.type === 'group' ? cg.find(g => sameId(g.id, lesson.targetId)) : null;
+      const lsStudents = lesson.type === 'individual' ? [newS.find(s => sameId(s.id, lesson.targetId))].filter(Boolean) : grp?.studentIds.map(id => newS.find(s => sameId(s.id, id))).filter(Boolean) || [];
       const billableStudents = lsStudents.filter(s => !s.archived);
       const att = {};
       const packageUse = {};
@@ -387,7 +406,7 @@ const loadSavedState = () => {
       };
     });
     const lessons = (data.lessons || []).map(l => {
-      const group = l.type === 'group' ? groups.find(g => g.id === l.targetId) : null;
+      const group = l.type === 'group' ? groups.find(g => sameId(g.id, l.targetId)) : null;
       const lessonSubject = group?.subject || l.subject || inferSubject(group?.name);
       return {
         subject: lessonSubject,
@@ -401,7 +420,7 @@ const loadSavedState = () => {
       };
     });
     let students = (data.students || []).map(s => {
-      const groupSubjects = groups.filter(g => g.studentIds?.includes(s.id)).map(g => g.subject);
+      const groupSubjects = groups.filter(g => g.studentIds?.some(id => sameId(id, s.id))).map(g => g.subject);
       const storedSubjects = s.subjects || (s.subject ? [s.subject] : []);
       const subjects = [...new Set([...storedSubjects, ...groupSubjects])];
       return {
@@ -413,6 +432,7 @@ const loadSavedState = () => {
         lessonRates: {},
         tgId: '',
         ...s,
+        rate: normalizeMoneyInput(s.rate, DEFAULT_RATE),
         subjects: subjects.length ? subjects : ['История']
       };
     });
@@ -430,9 +450,9 @@ const loadSavedState = () => {
         Object.entries(lesson.packageUse || {}).forEach(([sid, used]) => {
           if (!used) return;
           const studentId = Number(sid);
-          const student = students.find(s => s.id === studentId);
+          const student = students.find(s => sameId(s.id, studentId));
           if (!student) return;
-          const alreadyCharged = txs.some(tx => tx.lessonId === lesson.id && tx.studentId === studentId && tx.kind === 'attendance' && tx.type === 'charge');
+          const alreadyCharged = txs.some(tx => tx.lessonId === lesson.id && sameId(tx.studentId, studentId) && tx.kind === 'attendance' && tx.type === 'charge');
           if (alreadyCharged) return;
           const amount = getLessonRate(lesson, student, groups);
           migratedCharges.push({
@@ -485,12 +505,12 @@ const financeCore = window.TutorFinanceLogic;
 const txDelta = financeCore.txDelta;
 const getLessonSubject = (lesson, groups) => {
   if (lesson.subject) return lesson.subject;
-  if (lesson.type === 'group') return groups.find(g => g.id === lesson.targetId)?.subject || 'История';
+  if (lesson.type === 'group') return groups.find(g => sameId(g.id, lesson.targetId))?.subject || 'История';
   return 'История';
 };
 const getLessonStudents = (lesson, students, groups, opts = {}) => {
-  const group = lesson.type === 'group' ? groups.find(g => g.id === lesson.targetId) : null;
-  const list = lesson.type === 'individual' ? [students.find(s => s.id === lesson.targetId)].filter(Boolean) : group?.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean) || [];
+  const group = lesson.type === 'group' ? groups.find(g => sameId(g.id, lesson.targetId)) : null;
+  const list = lesson.type === 'individual' ? [students.find(s => sameId(s.id, lesson.targetId))].filter(Boolean) : group?.studentIds.map(id => students.find(s => sameId(s.id, id))).filter(Boolean) || [];
   return opts.includeArchived ? list : list.filter(s => !s.archived);
 };
 const omitRecordKey = (record, key) => {
@@ -513,7 +533,7 @@ const stripStudentFromLesson = (lesson, studentId) => {
   };
 };
 const getLessonRate = (lesson, student, groups) => {
-  const group = lesson.type === 'group' ? groups.find(g => g.id === lesson.targetId) : null;
+  const group = lesson.type === 'group' ? groups.find(g => sameId(g.id, lesson.targetId)) : null;
   const groupOverride = group?.rateOverrides?.[student.id];
   if (groupOverride !== undefined) return groupOverride;
   // Subject-specific rate on student
@@ -521,8 +541,8 @@ const getLessonRate = (lesson, student, groups) => {
   if (subjectRate !== undefined) return subjectRate;
   return student.rate;
 };
-const getStudentLastHomework = (studentId, lessons, groups) => lessons.filter(l => l.homework && (l.type === 'individual' ? l.targetId === studentId : groups.find(g => g.id === l.targetId)?.studentIds.includes(studentId))).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time))[0]?.homework || '';
-const getStudentLessons = (studentId, lessons, groups) => lessons.filter(l => l.type === 'individual' ? l.targetId === studentId : groups.find(g => g.id === l.targetId)?.studentIds.includes(studentId));
+const getStudentLastHomework = (studentId, lessons, groups) => lessons.filter(l => l.homework && (l.type === 'individual' ? sameId(l.targetId, studentId) : groups.find(g => sameId(g.id, l.targetId))?.studentIds.some(id => sameId(id, studentId)))).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time))[0]?.homework || '';
+const getStudentLessons = (studentId, lessons, groups) => lessons.filter(l => l.type === 'individual' ? sameId(l.targetId, studentId) : groups.find(g => sameId(g.id, l.targetId))?.studentIds.some(id => sameId(id, studentId)));
 const getTxMeta = tx => {
   if (tx.kind === 'package') return {
     title: 'Абонемент',
@@ -547,7 +567,7 @@ const getTxMeta = tx => {
 };
 const txSortKey = tx => `${tx.date || '0000-00-00'}-${String(tx.id || 0).padStart(14, '0')}`;
 const getStudentFinanceSummary = (student, txs, lessons, groups) => {
-  const ownTxs = txs.filter(tx => tx.studentId === student.id).sort((a, b) => txSortKey(a).localeCompare(txSortKey(b)));
+  const ownTxs = txs.filter(tx => sameId(tx.studentId, student.id)).sort((a, b) => txSortKey(a).localeCompare(txSortKey(b)));
   const txSum = ownTxs.reduce((s, tx) => s + txDelta(tx), 0);
   const opening = Number(student.balance || 0) - txSum;
   let running = opening;
@@ -679,7 +699,7 @@ const sameRecurringSlot = (lesson, source) => {
   if (lesson.seriesId || source.seriesId) return false;
   const lessonDay = new Date(`${lesson.date}T00:00:00`).getDay();
   const sourceDay = new Date(`${source.date}T00:00:00`).getDay();
-  return lesson.type === source.type && lesson.targetId === source.targetId && lesson.time === source.time && lessonDay === sourceDay;
+  return lesson.type === source.type && sameId(lesson.targetId, source.targetId) && lesson.time === source.time && lessonDay === sourceDay;
 };
 const lessonRange = lesson => {
   const start = timeToMin(lesson.time);
@@ -703,7 +723,7 @@ const findLessonConflicts = (candidate, lessons, students, groups, ignoreId = nu
   });
 };
 const conflictText = (conflicts, groups, students) => conflicts.map(l => {
-  const name = l.type === 'group' ? groups.find(g => g.id === l.targetId)?.name || 'Группа' : students.find(s => s.id === l.targetId)?.name || 'Ученик';
+  const name = l.type === 'group' ? getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) || 'Группа' : students.find(s => sameId(s.id, l.targetId))?.name || 'Ученик';
   return `${fmtDate(l.date)} ${l.time} · ${name}`;
 }).join('\n');
 const parseAvailability = text => {
@@ -1218,7 +1238,7 @@ function SearchModal({
   }, []);
   const lq = q.toLowerCase().trim();
   const rStudents = lq ? students.filter(s => s.name.toLowerCase().includes(lq)).slice(0, 5) : [];
-  const rGroups = lq ? groups.filter(g => g.name.toLowerCase().includes(lq)).slice(0, 4) : [];
+  const rGroups = lq ? groups.filter(g => getGroupDisplayName(g, students).toLowerCase().includes(lq)).slice(0, 4) : [];
   const rLessons = lq ? lessons.filter(l => (l.topic || '').toLowerCase().includes(lq) || (l.homework || '').toLowerCase().includes(lq)).slice(0, 4) : [];
   const hasResults = rStudents.length || rGroups.length || rLessons.length;
   return _jsxs(_Fragment, {
@@ -1323,7 +1343,7 @@ function SearchModal({
                 fontWeight: 700,
                 fontSize: 13
               },
-              children: [g.emoji || '', " ", g.name]
+              children: [g.emoji || '', " ", getGroupDisplayName(g, students)]
             })]
           }, g.id))]
         }), rLessons.length > 0 && _jsxs(_Fragment, {
@@ -1555,7 +1575,7 @@ function StudentModal({
   onSave
 }) {
   const [name, setName] = useState(student?.name || '');
-  const [rate, setRate] = useState(student?.rate || 1500);
+  const [rate, setRate] = useState(student?.rate ?? DEFAULT_RATE);
   const [phone, setPhone] = useState(student?.phone || '');
   const [tgId, setTgId] = useState(student?.tgId || '');
   const [subjects, setSubjects] = useState(student?.subjects || ['История']);
@@ -1570,11 +1590,12 @@ function StudentModal({
     if (!name.trim()) return;
     const lr = {};
     Object.entries(lessonRates).forEach(([k, v]) => {
-      if (String(v).trim() !== '') lr[k] = Number(v);
+      const n = Number(v);
+      if (String(v).trim() !== '' && Number.isFinite(n) && n >= 0) lr[k] = n;
     });
     onSave({
-      name,
-      rate: Number(rate),
+      name: name.trim(),
+      rate: normalizeMoneyInput(rate, student?.rate ?? DEFAULT_RATE),
       phone,
       tgId,
       subjects: subjects.length ? subjects : ['История'],
@@ -1620,6 +1641,7 @@ function StudentModal({
           className: "input",
           type: "number",
           required: true,
+          min: "0",
           value: rate,
           onChange: e => setRate(e.target.value)
         })
@@ -1746,18 +1768,21 @@ function GroupModal({
   const [sel, setSel] = useState(group?.studentIds || []);
   const [archived, setArchived] = useState(!!group?.archived);
   const [rateOverrides, setRateOverrides] = useState(group?.rateOverrides || {});
-  const availableStudents = students.filter(s => !s.archived || sel.includes(s.id)).sort((a, b) => Number(sel.includes(b.id)) - Number(sel.includes(a.id)) || a.name.localeCompare(b.name, 'ru'));
-  const toggle = id => setSel(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  const isSelected = id => sel.some(x => sameId(x, id));
+  const availableStudents = students.filter(s => !s.archived || isSelected(s.id)).sort((a, b) => Number(isSelected(b.id)) - Number(isSelected(a.id)) || a.name.localeCompare(b.name, 'ru'));
+  const toggle = id => setSel(p => p.some(x => sameId(x, id)) ? p.filter(x => !sameId(x, id)) : [...p, id]);
   const submit = e => {
     e.preventDefault();
-    if (!name.trim()) return;
+    const finalName = name.trim() || buildGroupAutoName(sel, students, subject);
+    const finalEmoji = emoji.trim() || randomGroupEmoji();
     const cleanRates = {};
     Object.entries(rateOverrides).forEach(([id, val]) => {
-      if (String(val).trim() !== '') cleanRates[id] = Number(val);
+      const n = Number(val);
+      if (String(val).trim() !== '' && Number.isFinite(n) && n >= 0) cleanRates[id] = n;
     });
     onSave({
-      name,
-      emoji,
+      name: finalName,
+      emoji: finalEmoji,
       subject,
       studentIds: sel,
       rateOverrides: cleanRates,
@@ -1782,12 +1807,12 @@ function GroupModal({
             placeholder: "\uD83C\uDFDB\uFE0F"
           })]
         }), _jsx(FormField, {
-          label: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435",
+          label: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)",
           children: _jsx("input", {
             className: "input",
-            required: true,
             value: name,
-            onChange: e => setName(e.target.value)
+            onChange: e => setName(e.target.value),
+            placeholder: "\u0410\u0432\u0442\u043E: \u0441\u043C\u0430\u0439\u043B + \u043F\u0435\u0440\u0432\u044B\u0435 \u0431\u0443\u043A\u0432\u044B \u0438\u043C\u0435\u043D"
           })
         })]
       }), _jsx(FormField, {
@@ -1807,13 +1832,13 @@ function GroupModal({
       }), _jsx("div", {
         className: "modal-scroll-list",
         children: availableStudents.map(s => _jsxs("div", {
-          className: `check-row student-check-row ${sel.includes(s.id) ? 'checked' : ''}`,
+          className: `check-row student-check-row ${isSelected(s.id) ? 'checked' : ''}`,
           children: [_jsxs("div", {
             onClick: () => toggle(s.id),
             className: "student-check-main",
             children: [_jsx("div", {
-              className: `check-box ${sel.includes(s.id) ? 'checked' : ''}`,
-              children: sel.includes(s.id) && _jsx(IcoCheck, {
+              className: `check-box ${isSelected(s.id) ? 'checked' : ''}`,
+              children: isSelected(s.id) && _jsx(IcoCheck, {
                 size: 14
               })
             }), _jsxs("div", {
@@ -1825,9 +1850,10 @@ function GroupModal({
                 children: ["\u043E\u0431\u044B\u0447\u043D\u0430\u044F \u0441\u0442\u0430\u0432\u043A\u0430 ", money(s.rate)]
               })]
             })]
-          }), sel.includes(s.id) && _jsx("input", {
+          }), isSelected(s.id) && _jsx("input", {
             className: "input rate-override-input",
             type: "number",
+            min: "0",
             placeholder: s.rate,
             value: rateOverrides[s.id] ?? '',
             onChange: e => setRateOverrides(p => ({
@@ -1875,7 +1901,7 @@ function TransactionModal({
   const [amt, setAmt] = useState(tx?.amount || '');
   const [date, setDate] = useState(tx?.date || getTodayDate());
   const [comment, setComment] = useState(tx?.comment || '');
-  const selectedStudent = students.find(s => s.id === Number(sid));
+  const selectedStudent = students.find(s => sameId(s.id, sid));
   const currentBalance = Number(selectedStudent?.balance || 0);
   const previewDelta = type === 'payment' ? Number(amt || 0) : -Number(amt || 0);
   const nextBalance = currentBalance + previewDelta;
@@ -2032,8 +2058,8 @@ function LessonModal({
   const [lessonNote, setLessonNote] = useState(lessonToEdit?.lessonNote || '');
   const [duration, setDuration] = useState(lessonToEdit?.duration || 60);
   const canApplyFuture = lessonToEdit?.status === 'planned' && lessons.filter(l => sameRecurringSlot(l, lessonToEdit) && l.status === 'planned' && lessonDateTimeKey(l) >= lessonDateTimeKey(lessonToEdit)).length > 1;
-  const activeGroups = groups.filter(g => !g.archived || lessonToEdit?.targetId === g.id);
-  const activeStudents = students.filter(s => !s.archived || lessonToEdit?.targetId === s.id || initialStudentId === s.id);
+  const activeGroups = groups.filter(g => !g.archived || sameId(lessonToEdit?.targetId, g.id));
+  const activeStudents = students.filter(s => !s.archived || sameId(lessonToEdit?.targetId, s.id) || sameId(initialStudentId, s.id));
   const dayFreeSlots = useMemo(() => {
     const ranges = lessons.filter(l => l.date === date && l.id !== lessonToEdit?.id && l.status !== 'cancelled').map(lessonRange).sort((a, b) => a.start - b.start);
     const slots = [];
@@ -2057,15 +2083,15 @@ function LessonModal({
   }, [date]);
   useEffect(() => {
     if (type === 'individual' && activeStudents.length && !targetId) setTgt(String(activeStudents[0].id));
-    if (type === 'group' && activeGroups.length && (!targetId || !activeGroups.find(g => g.id === Number(targetId)))) setTgt(String(activeGroups[0].id));
+    if (type === 'group' && activeGroups.length && (!targetId || !activeGroups.find(g => sameId(g.id, targetId)))) setTgt(String(activeGroups[0].id));
   }, [type, groups]);
   useEffect(() => {
     if (lessonToEdit) return;
     if (type === 'group') {
-      const g = activeGroups.find(x => x.id === Number(targetId));
+      const g = activeGroups.find(x => sameId(x.id, targetId));
       if (g?.subject) setSubject(g.subject);
     } else {
-      const s = activeStudents.find(x => x.id === Number(targetId));
+      const s = activeStudents.find(x => sameId(x.id, targetId));
       if (s?.subjects?.length) setSubject(s.subjects[0]);
     }
   }, [type, targetId]);
@@ -2414,8 +2440,8 @@ function AttendanceModal({
   onClose,
   onSave
 }) {
-  const group = lesson.type === 'group' ? groups.find(g => g.id === lesson.targetId) : null;
-  const ls = useMemo(() => lesson.type === 'individual' ? [students.find(s => s.id === lesson.targetId)].filter(Boolean) : group?.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean) || [], [lesson, students, groups]);
+  const group = lesson.type === 'group' ? groups.find(g => sameId(g.id, lesson.targetId)) : null;
+  const ls = useMemo(() => lesson.type === 'individual' ? [students.find(s => sameId(s.id, lesson.targetId))].filter(Boolean) : group?.studentIds.map(id => students.find(s => sameId(s.id, id))).filter(Boolean) || [], [lesson, students, groups]);
   const [att, setAtt] = useState(() => {
     if (lesson.status === 'completed' && lesson.attendance) return lesson.attendance;
     const a = {};
@@ -2672,17 +2698,17 @@ function StudentDetailModal({
   onArchive
 }) {
   const [detailTab, setDetailTab] = useState('overview');
-  const ownLessons = lessons.filter(l => l.type === 'individual' ? l.targetId === student.id : groups.find(g => g.id === l.targetId)?.studentIds?.includes(student.id)).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+  const ownLessons = lessons.filter(l => l.type === 'individual' ? sameId(l.targetId, student.id) : groups.find(g => sameId(g.id, l.targetId))?.studentIds?.some(id => sameId(id, student.id))).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
   const completed = ownLessons.filter(l => l.status === 'completed' || l.status === 'no_show');
   const skipped = completed.filter(l => l.attendance?.[student.id] === false || l.status === 'no_show').length;
   const attended = completed.length - skipped;
-  const studentTxs = txs.filter(tx => tx.studentId === student.id);
+  const studentTxs = txs.filter(tx => sameId(tx.studentId, student.id));
   const finance = getStudentFinanceSummary(student, txs, lessons, groups);
   const plannedLessons = ownLessons.filter(l => l.status === 'planned');
   const homeworkLessons = ownLessons.filter(l => l.homework).slice(0, 12);
   const phoneClean = (student.phone || '').replace(/\s/g, '');
   const tabs = [['overview', 'Обзор'], ['balance', 'Баланс'], ['lessons', `Уроки ${ownLessons.length}`], ['payments', `Оплаты ${studentTxs.length}`], ['homework', `ДЗ ${homeworkLessons.length}`], ['availability', 'Доп. расписание'], ['notes', 'Заметки']];
-  const memberGroups = groups.filter(g => !g.archived && g.studentIds?.includes(student.id));
+  const memberGroups = groups.filter(g => !g.archived && g.studentIds?.some(id => sameId(id, student.id)));
   return _jsxs(Modal, {
     title: student.name,
     onClose: onClose,
@@ -3064,7 +3090,7 @@ function StudentDetailModal({
               fontSize: 11,
               color: 'var(--text-sec)'
             },
-            children: [l.type === 'group' ? groups.find(g => g.id === l.targetId)?.name : 'Индивидуально', " \xB7 ", LESSON_STATUS[l.status]?.label || l.status]
+            children: [l.type === 'group' ? getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) : 'Индивидуально', " \xB7 ", LESSON_STATUS[l.status]?.label || l.status]
           })]
         }), l.homework && _jsx("span", {
           className: "badge badge-green",
@@ -3144,7 +3170,7 @@ function StudentDetailModal({
         title: "\u0413\u0440\u0443\u043F\u043F \u0443 \u0443\u0447\u0435\u043D\u0438\u043A\u0430 \u043D\u0435\u0442",
         text: "\u041A\u043E\u0433\u0434\u0430 \u0443\u0447\u0435\u043D\u0438\u043A \u0431\u0443\u0434\u0435\u0442 \u0432 \u0433\u0440\u0443\u043F\u043F\u0435, \u0437\u0434\u0435\u0441\u044C \u043F\u043E\u044F\u0432\u044F\u0442\u0441\u044F \u043E\u0431\u0449\u0438\u0435 \u043E\u043A\u043D\u0430 \u0434\u043B\u044F \u043F\u0435\u0440\u0435\u043D\u043E\u0441\u0430."
       }) : memberGroups.map(g => {
-        const members = g.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean);
+        const members = g.studentIds.map(id => students.find(s => sameId(s.id, id))).filter(Boolean);
         const slots = commonAvailability(members);
         return _jsxs("div", {
           className: "card",
@@ -3715,12 +3741,12 @@ function GroupDetailModal({
   onClose,
   onEdit
 }) {
-  const members = group.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean);
-  const groupLessons = lessons.filter(l => l.type === 'group' && l.targetId === group.id);
+  const members = group.studentIds.map(id => students.find(s => sameId(s.id, id))).filter(Boolean);
+  const groupLessons = lessons.filter(l => l.type === 'group' && sameId(l.targetId, group.id));
   const upcoming = groupLessons.filter(l => l.status === 'planned').sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time)).slice(0, 5);
   const completedCount = groupLessons.filter(l => l.status === 'completed').length;
   return _jsxs(Modal, {
-    title: `${group.emoji ? group.emoji + ' ' : ''}${group.name}`,
+    title: `${group.emoji ? group.emoji + ' ' : ''}${getGroupDisplayName(group, students)}`,
     onClose: onClose,
     children: [_jsxs("div", {
       style: {
@@ -4383,7 +4409,7 @@ function App() {
   };
   const saveStudent = data => {
     const edit = modal?.payload;
-    if (edit) setStudents(p => p.map(s => s.id === edit.id ? {
+    if (edit) setStudents(p => p.map(s => sameId(s.id, edit.id) ? {
       ...s,
       ...data
     } : s));else setStudents(p => [...p, {
@@ -4394,13 +4420,13 @@ function App() {
     setModal(null);
   };
   const archiveStudent = (id, archived = true) => {
-    setStudents(p => p.map(s => s.id === id ? {
+    setStudents(p => p.map(s => sameId(s.id, id) ? {
       ...s,
       archived
     } : s));
     if (archived) setGroups(p => p.map(g => ({
       ...g,
-      studentIds: g.studentIds.filter(x => x !== id)
+      studentIds: g.studentIds.filter(x => !sameId(x, id))
     })));
   };
   const delStudent = id => {
@@ -4408,13 +4434,13 @@ function App() {
       snapS = [...students],
       snapT = [...txs],
       snapG = [...groups];
-    const student = students.find(s => s.id === id);
-    const deletedLessons = lessons.filter(l => l.type === 'individual' && l.targetId === id);
+    const student = students.find(s => sameId(s.id, id));
+    const deletedLessons = lessons.filter(l => l.type === 'individual' && sameId(l.targetId, id));
     const cleanedFinance = removeLessonFinanceEffects(students, txs, deletedLessons);
-    const nextLessons = lessons.filter(l => !(l.type === 'individual' && l.targetId === id)).map(l => l.type === 'group' ? stripStudentFromLesson(l, id) : l);
+    const nextLessons = lessons.filter(l => !(l.type === 'individual' && sameId(l.targetId, id))).map(l => l.type === 'group' ? stripStudentFromLesson(l, id) : l);
     const nextGroups = groups.map(g => ({
       ...g,
-      studentIds: g.studentIds.filter(x => x !== id),
+      studentIds: g.studentIds.filter(x => !sameId(x, id)),
       rateOverrides: omitRecordKey(g.rateOverrides, id)
     }));
     recordDeletion(`Ученик ${student?.name || ''}`.trim(), () => {
@@ -4423,15 +4449,15 @@ function App() {
       setTxs(snapT);
       setGroups(snapG);
     });
-    setStudents(cleanedFinance.students.filter(s => s.id !== id));
+    setStudents(cleanedFinance.students.filter(s => !sameId(s.id, id)));
     setGroups(nextGroups);
     setLessons(nextLessons);
-    setTxs(cleanedFinance.txs.filter(tx => tx.studentId !== id));
+    setTxs(cleanedFinance.txs.filter(tx => !sameId(tx.studentId, id)));
     triggerUndo(`${student?.name || 'Ученик'} удалён`, snapL, snapS, snapT, snapG);
   };
   const saveGroup = data => {
     const edit = modal?.payload;
-    if (edit) setGroups(p => p.map(g => g.id === edit.id ? {
+    if (edit) setGroups(p => p.map(g => sameId(g.id, edit.id) ? {
       ...g,
       ...data
     } : g));else setGroups(p => [...p, {
@@ -4445,17 +4471,17 @@ function App() {
       snapS = [...students],
       snapT = [...txs],
       snapG = [...groups];
-    const group = groups.find(g => g.id === id);
-    const deletedLessons = lessons.filter(l => l.type === 'group' && l.targetId === id);
+    const group = groups.find(g => sameId(g.id, id));
+    const deletedLessons = lessons.filter(l => l.type === 'group' && sameId(l.targetId, id));
     const cleanedFinance = removeLessonFinanceEffects(students, txs, deletedLessons);
-    recordDeletion(`Группа ${group?.name || ''}`.trim(), () => {
+    recordDeletion(`Группа ${getGroupDisplayName(group, students) || ''}`.trim(), () => {
       setLessons(snapL);
       setStudents(snapS);
       setTxs(snapT);
       setGroups(snapG);
     });
-    setGroups(groups.filter(g => g.id !== id));
-    setLessons(lessons.filter(l => !(l.type === 'group' && l.targetId === id)));
+    setGroups(groups.filter(g => !sameId(g.id, id)));
+    setLessons(lessons.filter(l => !(l.type === 'group' && sameId(l.targetId, id))));
     setStudents(cleanedFinance.students);
     setTxs(cleanedFinance.txs);
     triggerUndo('Группа удалена', snapL, snapS, snapT, snapG);
@@ -4476,7 +4502,7 @@ function App() {
   const delTx = tx => {
     const snapS = [...students],
       snapT = [...txs];
-    const student = students.find(s => s.id === tx.studentId);
+    const student = students.find(s => sameId(s.id, tx.studentId));
     recordDeletion(`РћРїРµСЂР°С†РёСЏ ${student?.name || 'СѓС‡РµРЅРёРєР°'} ${money(tx.amount)}`, () => {
       setStudents(snapS);
       setTxs(snapT);
@@ -4766,7 +4792,7 @@ function App() {
   const exportCsv = () => {
     const header = ['date', 'student', 'type', 'amount', 'comment'];
     const rows = txs.map(tx => {
-      const s = students.find(st => st.id === tx.studentId);
+      const s = students.find(st => sameId(st.id, tx.studentId));
       return [tx.date, s?.name || 'Удален', tx.type, tx.amount, tx.comment || ''].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
     });
     const blob = new Blob([[header.join(','), ...rows].join('\n')], {
@@ -4883,7 +4909,7 @@ function App() {
   };
   const exportSchedulePdf = (fromDate, toDate) => {
     const filtered = lessons.filter(l => l.date >= fromDate && l.date <= toDate).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-    const getName = l => l.type === 'group' ? groups.find(g => g.id === l.targetId)?.name || '?' : students.find(s => s.id === l.targetId)?.name || '?';
+    const getName = l => l.type === 'group' ? getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) : students.find(s => sameId(s.id, l.targetId))?.name || '?';
     const statusRu = s => LESSON_STATUS[s]?.label || s;
     const cards = filtered.map(l => `
       <section class="lesson-card-print">
@@ -4940,7 +4966,7 @@ function App() {
       theme: p.theme === 'dark' ? 'light' : 'dark'
     }));
   };
-  const getLessonName = l => l.type === 'group' ? groups.find(g => g.id === l.targetId)?.name || '?' : students.find(s => s.id === l.targetId)?.name || '?';
+  const getLessonName = l => l.type === 'group' ? getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) : students.find(s => sameId(s.id, l.targetId))?.name || '?';
 
   // ── PAGES ──────────────────────────────────────────────────────────────────
 
@@ -4966,7 +4992,7 @@ function App() {
       kind: 'Абонемент',
       text: `${s.name}: остался 1 урок`,
       student: s
-    })), ...activeStudents.filter(s => !futureLessons.some(l => getLessonStudents(l, students, groups).some(st => st.id === s.id))).slice(0, 3).map(s => ({
+    })), ...activeStudents.filter(s => !futureLessons.some(l => getLessonStudents(l, students, groups).some(st => sameId(st.id, s.id)))).slice(0, 3).map(s => ({
       kind: 'Нет уроков',
       text: s.name,
       student: s
@@ -5080,6 +5106,11 @@ function App() {
               },
               children: [debtors, " \u0447\u0435\u043B."]
             })]
+          }), _jsx("button", {
+            className: "btn btn-sm btn-white demo-reset-top",
+            onClick: () => resetDemoData(true),
+            title: "\u0421\u0431\u0440\u043E\u0441\u0438\u0442\u044C \u043A \u0434\u0435\u043C\u043E-\u043D\u0430\u0431\u043E\u0440\u0443",
+            children: "\u0421\u0431\u0440\u043E\u0441 \u0434\u0435\u043C\u043E"
           }), _jsx("button", {
             className: "btn btn-sm btn-white theme-toggle",
             onClick: toggleTheme,
@@ -6252,7 +6283,7 @@ function App() {
     });
     const filteredGroups = groups.filter(g => {
       if (subjectFilter !== 'all' && g.subject !== subjectFilter) return false;
-      return g.name.toLowerCase().includes(q.toLowerCase());
+      return getGroupDisplayName(g, students).toLowerCase().includes(q.toLowerCase());
     });
     return _jsxs("div", {
       className: "students-page",
@@ -6490,8 +6521,8 @@ function App() {
       })]
       }) : _jsxs(_Fragment, {
         children: [filteredGroups.map(g => {
-          const memberNames = g.studentIds.map(id => students.find(s => s.id === id)?.name).filter(Boolean);
-          const futureCount = lessons.filter(l => l.type === 'group' && l.targetId === g.id && l.status === 'planned').length;
+          const memberNames = g.studentIds.map(id => students.find(s => sameId(s.id, id))?.name).filter(Boolean);
+          const futureCount = lessons.filter(l => l.type === 'group' && sameId(l.targetId, g.id) && l.status === 'planned').length;
           return _jsxs("div", {
             className: "student-item",
             style: {
@@ -6520,7 +6551,7 @@ function App() {
                     fontSize: 16
                   },
                   children: g.emoji
-                }), g.name, " ", g.archived && _jsx("span", {
+                }), getGroupDisplayName(g, students), " ", g.archived && _jsx("span", {
                   className: "badge badge-yellow",
                   children: "\u0410\u0420\u0425\u0418\u0412"
                 })]
@@ -6627,7 +6658,7 @@ function App() {
       finance: getStudentFinanceSummary(s, txs, lessons, groups)
     })).filter(x => x.finance.nextLesson).sort((a, b) => (a.finance.nextLesson.date + a.finance.nextLesson.time).localeCompare(b.finance.nextLesson.date + b.finance.nextLesson.time)).slice(0, 4);
     const historyTxs = txs.filter(tx => {
-      if (txStudentFilter !== 'all' && tx.studentId !== Number(txStudentFilter)) return false;
+      if (txStudentFilter !== 'all' && !sameId(tx.studentId, txStudentFilter)) return false;
       if (txTypeFilter !== 'all' && tx.type !== txTypeFilter) return false;
       return true;
     });
@@ -6701,11 +6732,12 @@ function App() {
         };
       });
       completedLessons.forEach(lesson => {
-        const grp = lesson.type === 'group' ? groups.find(g => g.id === lesson.targetId) : null;
-        const ls = lesson.type === 'individual' ? [students.find(s => s.id === lesson.targetId)].filter(Boolean) : grp?.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean) || [];
+        const ls = getLessonStudents(lesson, students, groups, {
+          includeArchived: true
+        });
         ls.forEach(s => {
           if (!stats[s.id]) return;
-          const rate = grp?.rateOverrides?.[s.id] ?? s.rate;
+          const rate = getLessonRate(lesson, s, groups);
           const present = lesson.status !== 'no_show' && lesson.attendance?.[s.id] !== false;
           stats[s.id].scheduled++;
           if (present) {
@@ -6734,10 +6766,11 @@ function App() {
     let periodEarned = 0,
       periodLost = 0;
     periodCompleted.forEach(lesson => {
-      const grp = lesson.type === 'group' ? groups.find(g => g.id === lesson.targetId) : null;
-      const ls = lesson.type === 'individual' ? [students.find(s => s.id === lesson.targetId)].filter(Boolean) : grp?.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean) || [];
+      const ls = getLessonStudents(lesson, students, groups, {
+        includeArchived: true
+      });
       ls.forEach(s => {
-        const rate = grp?.rateOverrides?.[s.id] ?? s.rate;
+        const rate = getLessonRate(lesson, s, groups);
         const present = lesson.status !== 'no_show' && lesson.attendance?.[s.id] !== false;
         if (present) periodEarned += rate;else periodLost += rate;
       });
@@ -6747,10 +6780,9 @@ function App() {
     let projIdeal = 0,
       projRealistic = 0;
     periodPlanned.forEach(lesson => {
-      const grp = lesson.type === 'group' ? groups.find(g => g.id === lesson.targetId) : null;
-      const ls = lesson.type === 'individual' ? [students.find(s => s.id === lesson.targetId)].filter(Boolean) : grp?.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean) || [];
+      const ls = getLessonStudents(lesson, students, groups);
       ls.forEach(s => {
-        const rate = grp?.rateOverrides?.[s.id] ?? s.rate;
+        const rate = getLessonRate(lesson, s, groups);
         projIdeal += rate;
         projRealistic += rate * (1 - avgSkipRate);
       });
@@ -6770,11 +6802,12 @@ function App() {
         };
       });
       periodCompleted.forEach(lesson => {
-        const grp = lesson.type === 'group' ? groups.find(g => g.id === lesson.targetId) : null;
-        const ls = lesson.type === 'individual' ? [students.find(s => s.id === lesson.targetId)].filter(Boolean) : grp?.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean) || [];
+        const ls = getLessonStudents(lesson, students, groups, {
+          includeArchived: true
+        });
         ls.forEach(s => {
           if (!st[s.id]) return;
-          const rate = grp?.rateOverrides?.[s.id] ?? s.rate;
+          const rate = getLessonRate(lesson, s, groups);
           const present = lesson.status !== 'no_show' && lesson.attendance?.[s.id] !== false;
           st[s.id].scheduled++;
           if (present) {
@@ -7308,7 +7341,7 @@ function App() {
           })]
         })]
       }), historyTxs.slice(0, 50).map(tx => {
-        const s = students.find(st => st.id === tx.studentId);
+        const s = students.find(st => sameId(st.id, tx.studentId));
         const meta = getTxMeta(tx);
         return _jsxs("div", {
           style: {
@@ -7976,10 +8009,11 @@ function App() {
           const mon = new Date(d);
           mon.setDate(d.getDate() - dow + 1);
           const key = mon.toISOString().slice(0, 10);
-          const grp = lesson.type === 'group' ? groups.find(g => g.id === lesson.targetId) : null;
-          const ls = lesson.type === 'individual' ? [students.find(s => s.id === lesson.targetId)].filter(Boolean) : grp?.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean) || [];
+          const ls = getLessonStudents(lesson, students, groups, {
+            includeArchived: true
+          });
           ls.forEach(s => {
-            const rate = grp?.rateOverrides?.[s.id] ?? s.rate;
+            const rate = getLessonRate(lesson, s, groups);
             const present = lesson.status !== 'no_show' && lesson.attendance?.[s.id] !== false;
             if (present) weekMap[key] = (weekMap[key] || 0) + rate;
           });
@@ -8063,10 +8097,11 @@ function App() {
           };
           const row = subjectMap[subject];
           row.lessons += 1;
-          const grp = lesson.type === 'group' ? groups.find(g => g.id === lesson.targetId) : null;
-          const ls = lesson.type === 'individual' ? [students.find(s => s.id === lesson.targetId)].filter(Boolean) : grp?.studentIds.map(id => students.find(s => s.id === id)).filter(Boolean) || [];
+          const ls = getLessonStudents(lesson, students, groups, {
+            includeArchived: true
+          });
           ls.forEach(s => {
-            const rate = grp?.rateOverrides?.[s.id] ?? s.rate;
+            const rate = getLessonRate(lesson, s, groups);
             const present = lesson.status !== 'no_show' && lesson.attendance?.[s.id] !== false;
             if (present && isFinalLesson(lesson)) row.earned += rate;
             if (!present && lesson.status === 'no_show') row.lost += rate;
@@ -8524,7 +8559,7 @@ function App() {
         payload: modal.payload
       }),
       onPay: studentId => {
-        const s = students.find(st => st.id === studentId);
+        const s = students.find(st => sameId(st.id, studentId));
         setModal({
           type: 'transaction',
           payload: {
