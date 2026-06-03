@@ -1,4 +1,4 @@
-// Compiled from inline JSX. Keep Babel out of the browser runtime.
+﻿// Compiled from inline JSX. Keep Babel out of the browser runtime.
 const _Fragment = React.Fragment;
 const _jsx = (type, props, key) => {
   const config = props == null ? {} : {...props};
@@ -58,7 +58,7 @@ const normalizeMoneyInput = (value, fallback = DEFAULT_RATE) => {
   const n = Number(value);
   return Number.isFinite(n) && n >= 0 ? n : fallback;
 };
-const GROUP_EMOJIS = ['📚', '✏️', '🎯', '🧠', '⚡', '🏛️', '🚀', '⭐', '🌿', '🔥'];
+const GROUP_EMOJIS = ['рџ“љ', '✏пёЏ', 'рџЋЇ', 'рџ§ ', '⚡', 'рџЏ›пёЏ', 'рџљЂ', '⭐', 'рџЊї', 'рџ”Ґ'];
 const randomGroupEmoji = () => GROUP_EMOJIS[Math.floor(Math.random() * GROUP_EMOJIS.length)];
 const firstNameLetter = name => String(name || '').trim().charAt(0).toUpperCase();
 const buildGroupAutoName = (ids = [], students = [], subject = 'Группа') => {
@@ -307,6 +307,258 @@ for (let w = 0; w < 12; w++) {
     });
   });
 }
+const IRINA_PARENT_DEMO_SEED = 'irina-parent-rich-v1';
+const IRINA_PARENT_DEMO_TOKEN = 'p_mpy6nf9a_9wy0oxmp';
+const demoDateFromToday = offset => {
+  const d = new Date(`${getTodayDate()}T00:00:00`);
+  d.setDate(d.getDate() + offset);
+  return localDateString(d);
+};
+const seededTxDelta = tx => tx?.type === 'payment' ? Number(tx.amount || 0) : -Number(tx?.amount || 0);
+const withRichIrinaDemoState = state => {
+  if (!state?.students?.length) return state;
+  if (state.settings?.irinaParentDemoSeed === IRINA_PARENT_DEMO_SEED) return state;
+  const irina = state.students.find(s => sameId(s.id, 12) || String(s.name || '').trim() === 'Ирина');
+  if (!irina) return state;
+  const irinaId = irina.id;
+  const seedLessonBase = 900000;
+  const seedTxBase = 910000;
+  const history = [{
+    offset: -42,
+    groupId: 6,
+    time: '16:30',
+    status: 'completed',
+    homeworkStatus: 'done',
+    topicsDelta: 2,
+    assimilation: 76,
+    topic: 'Российская империя после реформ Александра II',
+    homework: 'Параграф 12, таблица по реформам, 8 заданий формата ЕГЭ.',
+    comment: 'Ирина уверенно объяснила причины реформ, но в датах пока нужна тренировка.'
+  }, {
+    offset: -35,
+    groupId: 8,
+    time: '15:00',
+    status: 'completed',
+    homeworkStatus: 'partial',
+    topicsDelta: 1,
+    assimilation: 70,
+    topic: 'Политическая система РФ',
+    homework: 'Конспект по ветвям власти и задания 13-16.',
+    comment: 'Теорию понимает, часть домашней работы была сделана не полностью.'
+  }, {
+    offset: -28,
+    groupId: 6,
+    time: '16:30',
+    status: 'completed',
+    homeworkStatus: 'done',
+    topicsDelta: 2,
+    assimilation: 82,
+    topic: 'Первая русская революция',
+    homework: 'Хронология событий 1905-1907, тест на 20 вопросов.',
+    comment: 'Хороший урок: Ирина сама выстроила причинно-следственную цепочку.'
+  }, {
+    offset: -21,
+    groupId: 8,
+    time: '15:00',
+    status: 'no_show',
+    homeworkStatus: 'missed',
+    topicsDelta: 0,
+    assimilation: null,
+    topic: 'Социальная стратификация',
+    homework: 'Повторить термины и подготовить примеры.',
+    comment: 'Урок пропущен, тему нужно закрыть на следующей встрече.'
+  }, {
+    offset: -14,
+    groupId: 6,
+    time: '16:30',
+    status: 'completed',
+    homeworkStatus: 'done',
+    topicsDelta: 2,
+    assimilation: 86,
+    topic: 'Россия в Первой мировой войне',
+    homework: 'Карта событий, задания по источнику, повторить даты.',
+    comment: 'Сильный прогресс: ответы стали точнее, меньше потери баллов на формулировках.'
+  }, {
+    offset: -10,
+    groupId: 8,
+    time: '15:00',
+    status: 'completed',
+    homeworkStatus: 'partial',
+    topicsDelta: 1,
+    assimilation: 78,
+    topic: 'Экономика: рынок и конкуренция',
+    homework: 'Задания 1-8, термины по рынку, два мини-эссе.',
+    comment: 'Основу усвоила, но примеры в заданиях второй части пока слабые.'
+  }, {
+    offset: -6,
+    groupId: 6,
+    time: '16:30',
+    status: 'completed',
+    homeworkStatus: 'done',
+    topicsDelta: 2,
+    assimilation: 88,
+    topic: 'Февральская и Октябрьская революции',
+    homework: 'Сравнить позиции партий, прорешать задания 17-19.',
+    comment: 'Очень хороший разбор: Ирина стала увереннее в сравнении событий.'
+  }, {
+    offset: -2,
+    groupId: 8,
+    time: '15:00',
+    status: 'completed',
+    homeworkStatus: 'done',
+    topicsDelta: 1,
+    assimilation: 84,
+    topic: 'Право: основы конституционного строя',
+    homework: 'Повторить статьи Конституции, задания 14-16.',
+    comment: 'Домашняя работа сделана аккуратно, ошибки в основном в терминологии.'
+  }];
+  const upcoming = [{
+    offset: 2,
+    groupId: 6,
+    time: '16:30',
+    topic: 'Гражданская война',
+    homework: 'Подготовить хронологию и повторить причины победы большевиков.'
+  }, {
+    offset: 5,
+    groupId: 8,
+    time: '15:00',
+    topic: 'Гражданское право',
+    homework: 'Задания по договорам и правоспособности.'
+  }, {
+    offset: 9,
+    groupId: 6,
+    time: '16:30',
+    topic: 'СССР в 1920-1930-е годы',
+    homework: 'Таблица НЭП/индустриализация/коллективизация.'
+  }, {
+    offset: 12,
+    groupId: 8,
+    time: '15:00',
+    topic: 'Семейное право',
+    homework: 'Повторить права и обязанности супругов/родителей.'
+  }];
+  const makeLesson = (item, index, future = false) => {
+    const group = state.groups.find(g => sameId(g.id, item.groupId));
+    const peerIds = group?.studentIds || [];
+    const attendance = peerIds.reduce((acc, id) => {
+      acc[id] = item.status !== 'no_show' || !sameId(id, irinaId);
+      return acc;
+    }, {});
+    return {
+      id: seedLessonBase + index,
+      demoSeed: IRINA_PARENT_DEMO_SEED,
+      type: 'group',
+      targetId: item.groupId,
+      subject: group?.subject || inferSubject(group?.name),
+      date: demoDateFromToday(item.offset),
+      time: item.time,
+      duration: 60,
+      status: future ? 'planned' : item.status,
+      topic: item.topic,
+      homework: item.homework,
+      lessonNote: future ? '' : item.comment,
+      attendance: future ? {} : attendance,
+      packageUse: {},
+      homeworkStatusByStudent: future ? {} : {
+        [irinaId]: item.homeworkStatus
+      },
+      parentLessonCommentByStudent: future ? {} : {
+        [irinaId]: item.comment
+      },
+      progressByStudent: future ? {} : {
+        [irinaId]: {
+          topicsDelta: item.topicsDelta,
+          assimilationPercent: item.assimilation
+        }
+      }
+    };
+  };
+  const seededLessons = [...history.map((item, i) => makeLesson(item, i)), ...upcoming.map((item, i) => makeLesson(item, history.length + i, true))];
+  const charges = history.map((item, index) => ({
+    id: seedTxBase + index,
+    demoSeed: IRINA_PARENT_DEMO_SEED,
+    studentId: irinaId,
+    type: 'charge',
+    amount: 1100,
+    date: demoDateFromToday(item.offset),
+    comment: `${item.status === 'no_show' ? 'Пропуск' : 'Урок'}: ${item.topic}`,
+    lessonId: seedLessonBase + index,
+    kind: item.status === 'no_show' ? 'no_show' : 'attendance'
+  }));
+  const payments = [{
+    id: seedTxBase + 100,
+    demoSeed: IRINA_PARENT_DEMO_SEED,
+    studentId: irinaId,
+    type: 'payment',
+    amount: 4400,
+    date: demoDateFromToday(-37),
+    comment: 'Оплата за 4 занятия'
+  }, {
+    id: seedTxBase + 101,
+    demoSeed: IRINA_PARENT_DEMO_SEED,
+    studentId: irinaId,
+    type: 'payment',
+    amount: 3300,
+    date: demoDateFromToday(-11),
+    comment: 'Оплата за 3 занятия'
+  }];
+  const nextLessons = [...(state.lessons || []).filter(l => l.demoSeed !== IRINA_PARENT_DEMO_SEED), ...seededLessons];
+  const nextTxs = [...(state.txs || []).filter(tx => tx.demoSeed !== IRINA_PARENT_DEMO_SEED), ...charges, ...payments];
+  const irinaBalance = nextTxs.filter(tx => sameId(tx.studentId, irinaId)).reduce((sum, tx) => sum + seededTxDelta(tx), 0);
+  return {
+    ...state,
+    students: state.students.map(student => sameId(student.id, irinaId) ? {
+      ...student,
+      balance: irinaBalance,
+      packageLessons: 0,
+      subjects: ['История', 'Обществознание'],
+      goal: student.goal || 'ЕГЭ: уверенно закрыть вторую часть и выйти на 80+ баллов.',
+      notes: student.notes || 'Демо-профиль для проверки родительского кабинета.',
+      parentPortal: {
+        ...DEFAULT_PARENT_PORTAL,
+        ...(student.parentPortal || {}),
+        enabled: true,
+        token: student.parentPortal?.token || IRINA_PARENT_DEMO_TOKEN,
+        teacherComment: student.parentPortal?.teacherComment || 'Ирина стабильно занимается, прогресс заметен. Главный фокус сейчас: аккуратность формулировок и регулярное выполнение ДЗ.'
+      },
+      studyProgress: {
+        subject: 'История и обществознание',
+        totalTopics: 82,
+        completedTopics: 51,
+        assimilationPercent: 84,
+        focus: 'Закрепляем право и экономику, параллельно добираем сложные темы по истории XX века.',
+        mockTests: [{
+          id: 'irina-mock-1',
+          date: demoDateFromToday(-32),
+          title: 'Пробник по истории',
+          score: 54,
+          maxScore: 100,
+          comment: 'Слабее всего вторая часть и даты.'
+        }, {
+          id: 'irina-mock-2',
+          date: demoDateFromToday(-18),
+          title: 'Пробник по обществознанию',
+          score: 68,
+          maxScore: 100,
+          comment: 'Хороший рост по теории, ошибки в примерах.'
+        }, {
+          id: 'irina-mock-3',
+          date: demoDateFromToday(-4),
+          title: 'Мини-пробник по праву',
+          score: 78,
+          maxScore: 100,
+          comment: 'Тема стала заметно увереннее.'
+        }]
+      }
+    } : student),
+    lessons: nextLessons,
+    txs: nextTxs,
+    settings: {
+      ...(state.settings || {}),
+      irinaParentDemoSeed: IRINA_PARENT_DEMO_SEED
+    }
+  };
+};
 const STORAGE_KEY = 'tutor-app-state-v2';
 const STORAGE_VERSION = 4;
 const LESSON_STATUS = {
@@ -341,10 +593,37 @@ const LESSON_STATUS = {
     color: 'var(--red)'
   }
 };
+const HOMEWORK_STATUS = {
+  unset: {
+    label: 'Не отмечено',
+    short: '—',
+    tone: 'muted'
+  },
+  done: {
+    label: 'Сделано',
+    short: 'сделано',
+    tone: 'good'
+  },
+  partial: {
+    label: 'Частично',
+    short: 'частично',
+    tone: 'warn'
+  },
+  missed: {
+    label: 'Не сделано',
+    short: 'не сделано',
+    tone: 'bad'
+  },
+  none: {
+    label: 'Не задавалось',
+    short: 'не было',
+    tone: 'muted'
+  }
+};
 const FINAL_STATUSES = ['completed', 'cancelled_by_student', 'cancelled_by_tutor', 'rescheduled', 'no_show'];
 const isFinalLesson = lesson => FINAL_STATUSES.includes(lesson?.status);
 const money = n => `${Number(n || 0).toLocaleString('ru-RU')} ₽`;
-const cloneDemoState = () => ({
+const cloneDemoState = () => withRichIrinaDemoState({
   students: mockStudents.map(s => ({
     ...s,
     subjects: ['История', 'Общество'],
@@ -476,7 +755,7 @@ const loadSavedState = () => {
         } : s);
       }
     }
-    return {
+    return withRichIrinaDemoState({
       students,
       groups,
       lessons,
@@ -486,7 +765,7 @@ const loadSavedState = () => {
         theme: 'light',
         ...(data.settings || {})
       }
-    };
+    });
   } catch (e) {
     console.warn('Не удалось загрузить сохранение', e);
     return null;
@@ -672,6 +951,186 @@ const buildDebtParentMessage = (student, txs, lessons, groups) => {
   const lastPaymentText = lastPayment ? `\n\nПоследняя учтенная оплата: ${fmtDate(lastPayment.tx.date)} на ${money(lastPayment.tx.amount)}.` : '';
   return `Здравствуйте! По занятиям (${student.name}) сейчас долг ${money(debt)}.\n\nКак он сложился:\n${debtLines.join('\n') || '- в журнале нет подробных операций, долг записан в балансе ученика'}${lastPaymentText}\n\nИтого к оплате: ${money(debt)}.\nЕсли где-то у меня не учтена оплата, напишите, пожалуйста, сверю журнал.`;
 };
+const DEFAULT_PARENT_PORTAL = {
+  enabled: false,
+  token: '',
+  showFinance: true,
+  showHomework: true,
+  showProgress: true,
+  showSchedule: true,
+  showPayments: true,
+  allowPaymentNotice: true,
+  paymentNotices: [],
+  teacherComment: ''
+};
+const getParentPortalSettings = student => ({
+  ...DEFAULT_PARENT_PORTAL,
+  ...(student?.parentPortal || {})
+});
+const createParentPortalToken = () => `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+const parentPortalUrl = token => `${window.location.origin}${window.location.pathname}?parent=${encodeURIComponent(token)}`;
+const copyTextSafe = async text => {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const a = document.createElement('textarea');
+    a.value = text;
+    document.body.appendChild(a);
+    a.select();
+    document.execCommand('copy');
+    a.remove();
+    return true;
+  }
+};
+const getLessonStudentValue = (lesson, field, studentId, fallback = '') => {
+  const map = lesson?.[field] || {};
+  const direct = map?.[studentId] ?? map?.[String(studentId)];
+  return direct ?? fallback;
+};
+const getLessonHomeworkStatusForStudent = (lesson, studentId) => getLessonStudentValue(lesson, 'homeworkStatusByStudent', studentId, lesson?.homeworkStatus || 'unset') || 'unset';
+const getLessonParentCommentForStudent = (lesson, studentId) => getLessonStudentValue(lesson, 'parentLessonCommentByStudent', studentId, lesson?.parentLessonComment || '') || '';
+const withStudentLessonMeta = (lesson, studentId) => ({
+  ...lesson,
+  homeworkStatus: getLessonHomeworkStatusForStudent(lesson, studentId),
+  parentLessonComment: getLessonParentCommentForStudent(lesson, studentId)
+});
+const clampPercent = value => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(100, Math.round(n)));
+};
+const clampCount = value => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.round(n));
+};
+const getStudyProgress = student => {
+  const raw = student?.studyProgress || {};
+  const totalTopics = clampCount(raw.totalTopics);
+  const completedTopics = Math.min(totalTopics || clampCount(raw.completedTopics), clampCount(raw.completedTopics));
+  const mockTests = Array.isArray(raw.mockTests) ? raw.mockTests.map(test => ({
+    id: test.id || Date.now() + Math.random(),
+    date: test.date || getTodayDate(),
+    title: test.title || 'Пробник',
+    score: clampCount(test.score),
+    maxScore: Math.max(1, clampCount(test.maxScore || 100)),
+    comment: test.comment || ''
+  })).slice(0, 24) : [];
+  return {
+    subject: raw.subject || student?.subjects?.[0] || 'Предмет',
+    totalTopics,
+    completedTopics,
+    assimilationPercent: raw.assimilationPercent === '' || raw.assimilationPercent == null ? null : clampPercent(raw.assimilationPercent),
+    focus: raw.focus || '',
+    mockTests
+  };
+};
+const studyTheoryPercent = progress => progress?.totalTopics ? clampPercent(progress.completedTopics / progress.totalTopics * 100) : null;
+const mockTestPercent = test => test?.maxScore ? clampPercent(test.score / test.maxScore * 100) : null;
+const latestMockTest = progress => (progress?.mockTests || []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))[0] || null;
+const averageMockPercent = progress => {
+  const rows = progress?.mockTests || [];
+  if (!rows.length) return null;
+  return clampPercent(rows.reduce((sum, test) => sum + mockTestPercent(test), 0) / rows.length);
+};
+const getLessonProgressEntry = (map, studentId) => map?.[studentId] ?? map?.[String(studentId)] ?? {};
+const normalizeLessonProgressEntry = entry => {
+  const rawAssimilation = entry?.assimilationPercent;
+  return {
+    topicsDelta: clampCount(entry?.topicsDelta),
+    assimilationPercent: rawAssimilation === '' || rawAssimilation == null ? null : clampPercent(rawAssimilation)
+  };
+};
+const applyLessonStudyProgressState = (students, oldProgressByStudent = {}, nextProgressByStudent = {}, attendance = {}) => students.map(student => {
+  const current = getStudyProgress(student);
+  const oldEntry = normalizeLessonProgressEntry(getLessonProgressEntry(oldProgressByStudent, student.id));
+  const nextEntry = attendance?.[student.id] === false ? {
+    topicsDelta: 0,
+    assimilationPercent: null
+  } : normalizeLessonProgressEntry(getLessonProgressEntry(nextProgressByStudent, student.id));
+  const completedTopics = Math.max(0, current.completedTopics - oldEntry.topicsDelta + nextEntry.topicsDelta);
+  const totalTopics = current.totalTopics;
+  return {
+    ...student,
+    studyProgress: {
+      ...current,
+      completedTopics: totalTopics ? Math.min(totalTopics, completedTopics) : completedTopics,
+      assimilationPercent: nextEntry.assimilationPercent == null ? current.assimilationPercent : nextEntry.assimilationPercent
+    }
+  };
+});
+const buildParentPortalPayload = (student, students, groups, lessons, txs) => {
+  const portal = getParentPortalSettings(student);
+  const studyProgress = getStudyProgress(student);
+  const ownLessons = getStudentLessons(student.id, lessons, groups, {
+    includeArchived: true
+  }).map(l => withStudentLessonMeta(l, student.id)).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+  const completed = ownLessons.filter(l => l.status === 'completed' || l.status === 'no_show');
+  const planned = ownLessons.filter(l => l.status === 'planned' && l.date >= getTodayDate()).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const homeworkLessons = ownLessons.filter(l => l.homework).slice(0, 8);
+  const parentComments = completed.filter(l => l.parentLessonComment).slice(0, 5);
+  const homeworkStatusLessons = completed.filter(l => l.homeworkStatus && l.homeworkStatus !== 'unset').slice(0, 8);
+  const homeworkTotal = homeworkStatusLessons.filter(l => l.homeworkStatus !== 'none').length;
+  const homeworkScore = homeworkStatusLessons.reduce((sum, l) => sum + (l.homeworkStatus === 'done' ? 1 : l.homeworkStatus === 'partial' ? .5 : 0), 0);
+  const homeworkStats = homeworkStatusLessons.reduce((acc, l) => {
+    const key = HOMEWORK_STATUS[l.homeworkStatus] ? l.homeworkStatus : 'unset';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {
+    done: 0,
+    partial: 0,
+    missed: 0,
+    none: 0,
+    unset: 0
+  });
+  homeworkStats.total = homeworkTotal;
+  homeworkStats.rate = homeworkTotal ? Math.round(homeworkScore / homeworkTotal * 100) : null;
+  const attendanceNoShow = completed.filter(l => l.status === 'no_show' || l.attendance?.[student.id] === false).length;
+  const attendanceDone = completed.length - attendanceNoShow;
+  const attendanceStats = {
+    total: completed.length,
+    done: attendanceDone,
+    noShow: attendanceNoShow,
+    rate: completed.length ? Math.round(attendanceDone / completed.length * 100) : null
+  };
+  const subjectMap = {};
+  completed.forEach(l => {
+    const subject = getLessonSubject(l, groups);
+    if (!subjectMap[subject]) subjectMap[subject] = {
+      subject,
+      lessons: 0,
+      done: 0,
+      avg: 0,
+      ratings: []
+    };
+    subjectMap[subject].lessons += 1;
+    if (l.rating) subjectMap[subject].ratings.push(l.rating);
+    if (l.status === 'completed') subjectMap[subject].done += 1;
+  });
+  const progress = Object.values(subjectMap).map(row => ({
+    ...row,
+    avg: row.ratings.length ? row.ratings.reduce((s, v) => s + v, 0) / row.ratings.length : 0
+  })).sort((a, b) => b.lessons - a.lessons);
+  return {
+    portal,
+    finance: getStudentFinanceSummary(student, txs, lessons, groups),
+    nextLessons: planned.slice(0, 5),
+    recentLessons: completed.slice(0, 6),
+    parentComments,
+    homeworkLessons,
+    homeworkStatusLessons,
+    homeworkStats,
+    homeworkDoneRate: homeworkTotal ? Math.round(homeworkScore / homeworkTotal * 100) : null,
+    attendanceStats,
+    studyProgress,
+    theoryPercent: studyTheoryPercent(studyProgress),
+    assimilationPercent: studyProgress.assimilationPercent,
+    latestMock: latestMockTest(studyProgress),
+    mockAveragePercent: averageMockPercent(studyProgress),
+    progress
+  };
+};
 const balanceLabel = balance => balance < 0 ? `долг ${money(Math.abs(balance))}` : balance > 0 ? `предоплата ${money(balance)}` : 'закрыто';
 const balanceColor = balance => balance < 0 ? 'var(--red)' : balance > 0 ? 'var(--green)' : 'var(--black)';
 const timeToMin = time => {
@@ -728,13 +1187,13 @@ const conflictText = (conflicts, groups, students) => conflicts.map(l => {
 }).join('\n');
 const parseAvailability = text => {
   const days = {
-    пн: 1,
-    вт: 2,
-    ср: 3,
-    чт: 4,
-    пт: 5,
-    сб: 6,
-    вс: 0
+    '\u043f\u043d': 1,
+    '\u0432\u0442': 2,
+    '\u0441\u0440': 3,
+    '\u0447\u0442': 4,
+    '\u043f\u0442': 5,
+    '\u0441\u0431': 6,
+    '\u0432\u0441': 0
   };
   const result = [];
   String(text || '').split(/\n+/).forEach(line => {
@@ -1469,7 +1928,7 @@ const generateNotifications = (lessons, students, groups) => {
   students.filter(s => !s.archived && s.balance < -s.rate * 2).forEach(s => {
     notifs.push({
       id: 'debt_' + s.id,
-      icon: '💸',
+      icon: 'рџ’ё',
       text: `${s.name}: долг ${money(Math.abs(s.balance))}`,
       sub: 'Большая задолженность'
     });
@@ -1478,7 +1937,7 @@ const generateNotifications = (lessons, students, groups) => {
   students.filter(s => !s.archived && (s.packageLessons || 0) === 1).forEach(s => {
     notifs.push({
       id: 'pkg_' + s.id,
-      icon: '📦',
+      icon: 'рџ“¦',
       text: `${s.name}: абонемент заканчивается`,
       sub: 'Остался 1 урок'
     });
@@ -1490,7 +1949,7 @@ const generateNotifications = (lessons, students, groups) => {
   const tmrwCount = lessons.filter(l => l.date === tmrwStr && l.status === 'planned').length;
   if (tmrwCount > 0) notifs.push({
     id: 'tmrw',
-    icon: '📅',
+    icon: 'рџ“…',
     text: `Завтра ${tmrwCount} урок(ов)`,
     sub: ''
   });
@@ -1501,7 +1960,8 @@ const generateNotifications = (lessons, students, groups) => {
 function Modal({
   title,
   onClose,
-  children
+  children,
+  className = ''
 }) {
   const modalRef = useRef(null);
   useEffect(() => {
@@ -1536,7 +1996,7 @@ function Modal({
     className: "modal-overlay",
     onClick: e => e.target === e.currentTarget && onClose(),
     children: _jsxs("div", {
-      className: "modal",
+      className: `modal ${className}`.trim(),
       ref: modalRef,
       role: "dialog",
       "aria-modal": "true",
@@ -1751,6 +2211,416 @@ function StudentModal({
           type: "submit",
           className: "btn btn-black btn-full",
           children: "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C"
+        })]
+      })]
+    })
+  });
+}
+function StudentProfileModal({
+  student,
+  students,
+  groups,
+  lessons,
+  txs,
+  onClose,
+  onSave
+}) {
+  const portal = getParentPortalSettings(student);
+  const [name, setName] = useState(student?.name || '');
+  const [rate, setRate] = useState(student?.rate ?? DEFAULT_RATE);
+  const [phone, setPhone] = useState(student?.phone || '');
+  const [tgId, setTgId] = useState(student?.tgId || '');
+  const [parentName, setParentName] = useState(student?.parentName || '');
+  const [parentPhone, setParentPhone] = useState(student?.parentPhone || '');
+  const [parentNotes, setParentNotes] = useState(student?.parentNotes || '');
+  const [subjects, setSubjects] = useState(student?.subjects || ['История']);
+  const [goal, setGoal] = useState(student?.goal || '');
+  const [level, setLevel] = useState(student?.level || '');
+  const [weakTopics, setWeakTopics] = useState(student?.weakTopics || '');
+  const [notes, setNotes] = useState(student?.notes || '');
+  const [availabilityNotes, setAvailabilityNotes] = useState(student?.availabilityNotes || '');
+  const [packageLessons, setPackageLessons] = useState(student?.packageLessons || 0);
+  const [lessonRates, setLessonRates] = useState(student?.lessonRates || {});
+  const [archived, setArchived] = useState(!!student?.archived);
+  const [portalSettings, setPortalSettings] = useState(portal);
+  const [parentComment, setParentComment] = useState(portal.teacherComment || '');
+  const ownLessons = getStudentLessons(student.id, lessons, groups).map(l => withStudentLessonMeta(l, student.id)).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+  const finance = getStudentFinanceSummary(student, txs, lessons, groups);
+  const nextLesson = ownLessons.filter(l => l.status === 'planned' && l.date >= getTodayDate()).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))[0];
+  const completed = ownLessons.filter(l => l.status === 'completed' || l.status === 'no_show');
+  const toggleSubject = subject => setSubjects(p => p.includes(subject) ? p.filter(x => x !== subject) : [...p, subject]);
+  const togglePortal = key => setPortalSettings(p => {
+    if (key === 'enabled' && !p.enabled && !p.token) return {
+      ...p,
+      enabled: true,
+      token: createParentPortalToken()
+    };
+    return {
+      ...p,
+      [key]: !p[key]
+    };
+  });
+  const profileChecks = [{
+    label: 'Контакты',
+    ok: !!(phone.trim() || tgId.trim())
+  }, {
+    label: 'Родитель',
+    ok: !!(parentName.trim() || parentPhone.trim())
+  }, {
+    label: 'Цель',
+    ok: !!goal.trim()
+  }, {
+    label: 'Уровень',
+    ok: !!(level.trim() || weakTopics.trim())
+  }, {
+    label: 'Окна',
+    ok: !!availabilityNotes.trim()
+  }, {
+    label: 'Ссылка',
+    ok: !!portalSettings.enabled
+  }];
+  const completion = Math.round(profileChecks.filter(x => x.ok).length / profileChecks.length * 100);
+  const submit = e => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    const lr = {};
+    Object.entries(lessonRates).forEach(([k, v]) => {
+      const n = Number(v);
+      if (String(v).trim() !== '' && Number.isFinite(n) && n >= 0) lr[k] = n;
+    });
+    const nextPortal = {
+      ...portalSettings,
+      teacherComment: parentComment.trim()
+    };
+    if (nextPortal.enabled && !nextPortal.token) nextPortal.token = createParentPortalToken();
+    onSave({
+      name: name.trim(),
+      rate: normalizeMoneyInput(rate, student?.rate ?? DEFAULT_RATE),
+      phone,
+      tgId,
+      parentName: parentName.trim(),
+      parentPhone: parentPhone.trim(),
+      parentNotes: parentNotes.trim(),
+      subjects: subjects.length ? subjects : ['История'],
+      goal,
+      level,
+      weakTopics,
+      notes,
+      availabilityNotes,
+      packageLessons: Math.max(0, Number(packageLessons) || 0),
+      archived,
+      lessonRates: lr,
+      parentPortal: nextPortal
+    });
+  };
+  const portalLink = portalSettings.token ? parentPortalUrl(portalSettings.token) : '';
+  return _jsx(Modal, {
+    title: "Карта ученика",
+    onClose: onClose,
+    className: "student-profile-modal",
+    children: _jsxs("form", {
+      className: "student-profile-form",
+      onSubmit: submit,
+      children: [_jsxs("div", {
+        className: "student-profile-hero",
+        children: [_jsxs("div", {
+          children: [_jsx("span", {
+            children: "Профиль для работы и родительской ссылки"
+          }), _jsx("h2", {
+            children: name || student.name
+          }), _jsxs("p", {
+            children: ["Заполнено ", completion, "%. Чем полнее карта, тем полезнее родительский кабинет."]
+          })]
+        }), _jsxs("div", {
+          className: "student-profile-progress",
+          children: [_jsx("strong", {
+            children: `${completion}%`
+          }), _jsx("div", {
+            children: _jsx("i", {
+              style: {
+                width: `${completion}%`
+              }
+            })
+          })]
+        })]
+      }), _jsxs("div", {
+        className: "student-profile-layout",
+        children: [_jsxs("aside", {
+          className: "student-profile-side",
+          children: [_jsx("div", {
+            className: "profile-side-title",
+            children: "Что готово"
+          }), profileChecks.map(item => _jsxs("div", {
+            className: `profile-check ${item.ok ? 'done' : ''}`,
+            children: [_jsx("span", {
+              children: item.ok ? "✓" : "•"
+            }), _jsx("b", {
+              children: item.label
+            })]
+          }, item.label)), _jsxs("div", {
+            className: "profile-mini-card",
+            children: [_jsx("span", {
+              children: "Баланс"
+            }), _jsx("strong", {
+              style: {
+                color: balanceColor(finance.balance)
+              },
+              children: balanceLabel(finance.balance)
+            })]
+          }), _jsxs("div", {
+            className: "profile-mini-card",
+            children: [_jsx("span", {
+              children: "Следующий урок"
+            }), _jsx("strong", {
+              children: nextLesson ? `${fmtDate(nextLesson.date)} ${nextLesson.time}` : "не запланирован"
+            })]
+          }), _jsxs("div", {
+            className: "profile-mini-card",
+            children: [_jsx("span", {
+              children: "Проведено"
+            }), _jsx("strong", {
+              children: `${completed.length} уроков`
+            })]
+          })]
+        }), _jsxs("div", {
+          className: "student-profile-main",
+          children: [_jsxs("section", {
+            className: "profile-section",
+            children: [_jsx("h3", {
+              children: "Основное"
+            }), _jsxs("div", {
+              className: "profile-grid two",
+              children: [_jsx(FormField, {
+                label: "Имя ученика",
+                children: _jsx("input", {
+                  className: "input",
+                  required: true,
+                  value: name,
+                  onChange: e => setName(e.target.value),
+                  placeholder: "ФИО"
+                })
+              }), _jsx(FormField, {
+                label: "Телефон ученика",
+                children: _jsx("input", {
+                  className: "input",
+                  value: phone,
+                  onChange: e => setPhone(e.target.value),
+                  placeholder: "+7 ..."
+                })
+              }), _jsx(FormField, {
+                label: "Telegram",
+                children: _jsx("input", {
+                  className: "input",
+                  value: tgId,
+                  onChange: e => setTgId(e.target.value),
+                  placeholder: "@username"
+                })
+              }), _jsx(FormField, {
+                label: "Уровень / класс",
+                children: _jsx("input", {
+                  className: "input",
+                  value: level,
+                  onChange: e => setLevel(e.target.value),
+                  placeholder: "10 класс, база, олимпиадник"
+                })
+              })]
+            })]
+          }), _jsxs("section", {
+            className: "profile-section",
+            children: [_jsx("h3", {
+              children: "Обучение"
+            }), _jsx(FormField, {
+              label: "Предметы",
+              children: _jsx("div", {
+                className: "profile-subject-grid",
+                children: SUBJECTS.map(subject => _jsx("button", {
+                  type: "button",
+                  className: `btn btn-sm btn-full ${subjects.includes(subject) ? 'btn-black' : 'btn-white'}`,
+                  onClick: () => toggleSubject(subject),
+                  children: subject
+                }, subject))
+              })
+            }), _jsx(FormField, {
+              label: "Цель",
+              children: _jsx("input", {
+                className: "input",
+                value: goal,
+                onChange: e => setGoal(e.target.value),
+                placeholder: "ЕГЭ 85+, ОГЭ, подтянуть школу"
+              })
+            }), _jsx(FormField, {
+              label: "Слабые темы / фокус",
+              children: _jsx("textarea", {
+                className: "input",
+                value: weakTopics,
+                onChange: e => setWeakTopics(e.target.value),
+                placeholder: "Например: источники, эссе, хронология, конспекты",
+                style: {
+                  minHeight: 74,
+                  resize: 'vertical'
+                }
+              })
+            })]
+          }), _jsxs("section", {
+            className: "profile-section",
+            children: [_jsx("h3", {
+              children: "Финансы"
+            }), _jsxs("div", {
+              className: "profile-grid two",
+              children: [_jsx(FormField, {
+                label: "Базовая ставка ₽/урок",
+                children: _jsx("input", {
+                  className: "input",
+                  type: "number",
+                  min: "0",
+                  value: rate,
+                  onChange: e => setRate(e.target.value)
+                })
+              }), _jsx(FormField, {
+                label: "Остаток абонемента",
+                children: _jsx("input", {
+                  className: "input",
+                  type: "number",
+                  min: "0",
+                  value: packageLessons,
+                  onChange: e => setPackageLessons(e.target.value)
+                })
+              })]
+            }), subjects.length > 1 && _jsx("div", {
+              className: "profile-rate-list",
+              children: subjects.map(subject => _jsxs("div", {
+                children: [_jsx("span", {
+                  children: subject
+                }), _jsx("input", {
+                  className: "input",
+                  type: "number",
+                  min: "0",
+                  placeholder: `${rate} ₽`,
+                  value: lessonRates[subject] ?? '',
+                  onChange: e => setLessonRates(p => ({
+                    ...p,
+                    [subject]: e.target.value
+                  }))
+                })]
+              }, subject))
+            })]
+          }), _jsxs("section", {
+            className: "profile-section",
+            children: [_jsx("h3", {
+              children: "Родители и связь"
+            }), _jsxs("div", {
+              className: "profile-grid two",
+              children: [_jsx(FormField, {
+                label: "Имя родителя",
+                children: _jsx("input", {
+                  className: "input",
+                  value: parentName,
+                  onChange: e => setParentName(e.target.value),
+                  placeholder: "Как обращаться"
+                })
+              }), _jsx(FormField, {
+                label: "Телефон родителя",
+                children: _jsx("input", {
+                  className: "input",
+                  value: parentPhone,
+                  onChange: e => setParentPhone(e.target.value),
+                  placeholder: "+7 ..."
+                })
+              })]
+            }), _jsx(FormField, {
+              label: "Комментарий родителю в кабинете",
+              children: _jsx("textarea", {
+                className: "input",
+                value: parentComment,
+                onChange: e => setParentComment(e.target.value),
+                placeholder: "Короткое пояснение, которое родитель увидит сверху",
+                style: {
+                  minHeight: 76,
+                  resize: 'vertical'
+                }
+              })
+            }), _jsx(FormField, {
+              label: "Внутренняя заметка по родителю",
+              children: _jsx("textarea", {
+                className: "input",
+                value: parentNotes,
+                onChange: e => setParentNotes(e.target.value),
+                placeholder: "Что важно помнить: формат общения, договоренности, ожидания",
+                style: {
+                  minHeight: 68,
+                  resize: 'vertical'
+                }
+              })
+            }), _jsxs("div", {
+              className: "profile-toggle-grid",
+              children: [['enabled', 'Родительская ссылка'], ['showFinance', 'Финансы'], ['showHomework', 'ДЗ'], ['showProgress', 'Прогресс'], ['showSchedule', 'Расписание'], ['allowPaymentNotice', 'Заявка оплаты']].map(([key, label]) => _jsxs("button", {
+                type: "button",
+                className: `profile-toggle ${portalSettings[key] ? 'active' : ''}`,
+                onClick: () => togglePortal(key),
+                children: [_jsx("span", {
+                  children: portalSettings[key] ? "✓" : "•"
+                }), _jsx("b", {
+                  children: label
+                })]
+              }, key))
+            }), _jsx("div", {
+              className: "profile-link-preview",
+              children: portalSettings.enabled ? portalLink || "Ссылка появится после сохранения" : "Родительская ссылка выключена"
+            })]
+          }), _jsxs("section", {
+            className: "profile-section",
+            children: [_jsx("h3", {
+              children: "Расписание и заметки"
+            }), _jsx(FormField, {
+              label: "Свободные окна",
+              children: _jsx("textarea", {
+                className: "input",
+                value: availabilityNotes,
+                onChange: e => setAvailabilityNotes(e.target.value),
+                placeholder: "Пн 15:00-18:00\nСр 16:30-19:00",
+                style: {
+                  minHeight: 88,
+                  resize: 'vertical'
+                }
+              })
+            }), _jsx(FormField, {
+              label: "Внутренние заметки",
+              children: _jsx("textarea", {
+                className: "input",
+                value: notes,
+                onChange: e => setNotes(e.target.value),
+                placeholder: "Методика, особенности, важные договоренности",
+                style: {
+                  minHeight: 88,
+                  resize: 'vertical'
+                }
+              })
+            }), _jsxs("div", {
+              className: `check-row ${archived ? 'checked' : ''}`,
+              onClick: () => setArchived(!archived),
+              children: [_jsx("span", {
+                className: "check-label-strong",
+                children: "Архивный ученик"
+              }), _jsx("div", {
+                className: `check-box ${archived ? 'checked' : ''}`,
+                children: archived && _jsx(IcoCheck, {
+                  size: 14
+                })
+              })]
+            })]
+          })]
+        })]
+      }), _jsxs("div", {
+        className: "modal-actions profile-actions",
+        children: [_jsx("button", {
+          type: "button",
+          className: "btn btn-white btn-full",
+          onClick: onClose,
+          children: "Отмена"
+        }), _jsx("button", {
+          type: "submit",
+          className: "btn btn-black btn-full",
+          children: "Сохранить карту"
         })]
       })]
     })
@@ -2450,45 +3320,257 @@ function AttendanceModal({
   });
   const [topic, setTopic] = useState(lesson.topic || '');
   const [homework, setHomework] = useState(lesson.homework || '');
+  const [homeworkStatusByStudent, setHomeworkStatusByStudent] = useState(() => {
+    const map = {};
+    ls.forEach(s => map[s.id] = getLessonHomeworkStatusForStudent(lesson, s.id));
+    return map;
+  });
+  const [parentLessonCommentByStudent, setParentLessonCommentByStudent] = useState(() => {
+    const map = {};
+    ls.forEach(s => map[s.id] = getLessonParentCommentForStudent(lesson, s.id));
+    return map;
+  });
+  const [progressByStudent, setProgressByStudent] = useState(() => {
+    const map = {};
+    ls.forEach(s => {
+      const saved = normalizeLessonProgressEntry(getLessonProgressEntry(lesson.progressByStudent, s.id));
+      const current = getStudyProgress(s);
+      map[s.id] = {
+        topicsDelta: saved.topicsDelta || 0,
+        assimilationPercent: saved.assimilationPercent ?? current.assimilationPercent ?? ''
+      };
+    });
+    return map;
+  });
+  const [previewStudentId, setPreviewStudentId] = useState(() => ls[0]?.id || null);
   const [lessonNote, setLessonNote] = useState(lesson.lessonNote || '');
   const [rating, setRating] = useState(lesson.rating || 0);
   const [hoverRating, setHoverRating] = useState(0);
+  const presentStudents = ls.filter(s => att[s.id]);
+  const chargeTotal = presentStudents.reduce((sum, s) => sum + (group?.rateOverrides?.[s.id] ?? s.rate), 0);
+  const lessonTitle = lesson.type === 'group' ? group?.name || getLessonSubject(lesson, groups) : ls[0]?.name || getLessonSubject(lesson, groups);
+  const previewStudent = ls.find(s => sameId(s.id, previewStudentId)) || ls[0];
+  const previewStudentKey = previewStudent?.id;
+  const homeworkStatus = previewStudentKey ? homeworkStatusByStudent[previewStudentKey] || 'unset' : 'unset';
+  const homeworkStatusInfo = HOMEWORK_STATUS[homeworkStatus] || HOMEWORK_STATUS.unset;
+  const parentPreviewComment = previewStudentKey ? String(parentLessonCommentByStudent[previewStudentKey] || '').trim() : '';
+  const parentPreviewTopic = topic.trim();
+  const parentPreviewHomework = homework.trim();
+  const previewStudyProgress = previewStudent ? getStudyProgress(previewStudent) : null;
+  const previewProgressEntry = previewStudentKey ? progressByStudent[previewStudentKey] || {} : {};
+  const previewTopicsDelta = clampCount(previewProgressEntry.topicsDelta);
+  const previewCompletedAfter = previewStudyProgress ? Math.max(0, previewStudyProgress.completedTopics + (att[previewStudentKey] === false ? 0 : previewTopicsDelta)) : 0;
+  const previewTheoryAfter = previewStudyProgress?.totalTopics ? clampPercent(Math.min(previewStudyProgress.totalTopics, previewCompletedAfter) / previewStudyProgress.totalTopics * 100) : null;
+  const setStudentHomeworkStatus = (studentId, status) => {
+    setPreviewStudentId(studentId);
+    setHomeworkStatusByStudent(p => ({
+      ...p,
+      [studentId]: status
+    }));
+  };
+  const setStudentParentComment = (studentId, value) => {
+    setPreviewStudentId(studentId);
+    setParentLessonCommentByStudent(p => ({
+      ...p,
+      [studentId]: value
+    }));
+  };
+  const setStudentProgressField = (studentId, field, value) => {
+    setPreviewStudentId(studentId);
+    setProgressByStudent(p => ({
+      ...p,
+      [studentId]: {
+        ...(p[studentId] || {}),
+        [field]: value
+      }
+    }));
+  };
+  const setAllProgressField = (field, value) => {
+    const next = {};
+    ls.forEach(s => {
+      if (!att[s.id]) return;
+      next[s.id] = {
+        ...(progressByStudent[s.id] || {}),
+        [field]: value
+      };
+    });
+    setProgressByStudent(p => ({
+      ...p,
+      ...next
+    }));
+  };
+  const setAllAttendance = present => {
+    const next = {};
+    ls.forEach(s => next[s.id] = present);
+    setAtt(next);
+  };
+  const setHomeworkForPresent = status => {
+    const next = {};
+    ls.forEach(s => {
+      if (att[s.id]) next[s.id] = status;
+    });
+    setHomeworkStatusByStudent(p => ({
+      ...p,
+      ...next
+    }));
+  };
+  const applyFastProgress = () => {
+    const next = {};
+    ls.forEach(s => {
+      if (!att[s.id]) return;
+      next[s.id] = {
+        ...(progressByStudent[s.id] || {}),
+        topicsDelta: 1,
+        assimilationPercent: 85
+      };
+    });
+    setProgressByStudent(p => ({
+      ...p,
+      ...next
+    }));
+  };
+  const presentReadyCount = ls.filter(s => att[s.id]).length;
+  const homeworkMarkedCount = ls.filter(s => att[s.id] && (homeworkStatusByStudent[s.id] || 'unset') !== 'unset').length;
+  const progressMarkedCount = ls.filter(s => {
+    if (!att[s.id]) return false;
+    const entry = normalizeLessonProgressEntry(progressByStudent[s.id] || {});
+    return entry.topicsDelta || entry.assimilationPercent != null;
+  }).length;
   const submit = e => {
     e.preventDefault();
+    const primaryStudentId = ls[0]?.id;
+    const nextHomeworkStatusByStudent = {};
+    const nextParentCommentByStudent = {};
+    const nextProgressByStudent = {};
+    ls.forEach(s => {
+      nextHomeworkStatusByStudent[s.id] = homeworkStatusByStudent[s.id] || 'unset';
+      nextParentCommentByStudent[s.id] = String(parentLessonCommentByStudent[s.id] || '').trim();
+      const progressEntry = normalizeLessonProgressEntry(progressByStudent[s.id] || {});
+      if (att[s.id] && (progressEntry.topicsDelta || progressEntry.assimilationPercent != null)) {
+        nextProgressByStudent[s.id] = progressEntry;
+      }
+    });
     onSave(lesson.id, att, {
       topic,
       homework,
+      homeworkStatus: lesson.type === 'group' ? 'unset' : nextHomeworkStatusByStudent[primaryStudentId] || 'unset',
+      homeworkStatusByStudent: nextHomeworkStatusByStudent,
+      parentLessonComment: lesson.type === 'group' ? '' : nextParentCommentByStudent[primaryStudentId] || '',
+      parentLessonCommentByStudent: nextParentCommentByStudent,
+      progressByStudent: nextProgressByStudent,
       lessonNote,
       rating
     });
   };
   return _jsxs(Modal, {
-    title: "\u041F\u043E\u0441\u0435\u0449\u0430\u0435\u043C\u043E\u0441\u0442\u044C",
+    title: lesson.status === 'completed' ? "Редактировать закрытие" : "\u0417\u0430\u043A\u0440\u044B\u0442\u044C \u0443\u0440\u043E\u043A",
     onClose: onClose,
+    className: "attendance-flow-modal",
     children: [_jsxs("div", {
-      style: {
-        background: 'var(--bg-subtle)',
-        border: 'var(--border)',
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 14,
-        fontSize: 12
-      },
-      children: [_jsx("strong", {
-        children: fmtDate(lesson.date)
-      }), " \u0432 ", _jsx("strong", {
-        children: lesson.time
-      }), _jsx("div", {
-        style: {
-          marginTop: 4,
-          color: 'var(--text-sec)'
-        },
-        children: "\u0421\u043D\u0438\u043C\u0438\u0442\u0435 \u0433\u0430\u043B\u043E\u0447\u043A\u0443 \u2014 \u0434\u0435\u043D\u044C\u0433\u0438 \u0432\u0435\u0440\u043D\u0443\u0442\u0441\u044F \u043D\u0430 \u0431\u0430\u043B\u0430\u043D\u0441"
+      className: "attendance-flow-hero",
+      children: [_jsxs("div", {
+        children: [_jsx("span", {
+          children: "\u041F\u043E\u0441\u043B\u0435\u0443\u0440\u043E\u0447\u043D\u043E\u0435 \u0437\u0430\u043F\u043E\u043B\u043D\u0435\u043D\u0438\u0435"
+        }), _jsx("strong", {
+          children: lessonTitle
+        }), _jsxs("p", {
+          children: [fmtDate(lesson.date), " \u00B7 ", lesson.time, " \u00B7 ", getLessonSubject(lesson, groups)]
+        })]
+      }), _jsxs("div", {
+        className: "attendance-flow-kpis",
+        children: [_jsxs("div", {
+          children: [_jsx("span", {
+            children: "\u041F\u0440\u0438\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u044E\u0442"
+          }), _jsxs("b", {
+            children: [presentStudents.length, "/", ls.length]
+          })]
+        }), _jsxs("div", {
+          children: [_jsx("span", {
+            children: "\u0421\u043F\u0438\u0441\u0430\u043D\u0438\u0435"
+          }), _jsx("b", {
+            children: money(chargeTotal)
+          })]
+        })]
       })]
     }), _jsxs("form", {
       onSubmit: submit,
-      children: [_jsx(FormField, {
-        label: "\u0422\u0435\u043C\u0430",
+      className: "attendance-flow-form",
+      children: [_jsxs("section", {
+        className: "attendance-quick-panel",
+        children: [_jsxs("div", {
+          className: "attendance-flow-section-head",
+          children: [_jsxs("div", {
+            children: [_jsx("span", {
+              children: "1. Сначала закрываем факт урока"
+            }), _jsx("strong", {
+              children: "Кто был и что спишется"
+            })]
+          }), _jsxs("b", {
+            children: [presentReadyCount, "/", ls.length, " присутствуют"]
+          })]
+        }), _jsxs("div", {
+          className: "attendance-quick-actions",
+          children: [_jsx("button", {
+            type: "button",
+            className: "btn btn-sm btn-black",
+            onClick: () => setAllAttendance(true),
+            children: "Все были"
+          }), _jsx("button", {
+            type: "button",
+            className: "btn btn-sm btn-white",
+            onClick: () => setAllAttendance(false),
+            children: "Никого"
+          }), _jsx("button", {
+            type: "button",
+            className: "btn btn-sm btn-white",
+            onClick: () => setHomeworkForPresent('done'),
+            children: "Прошлое ДЗ сделано всем"
+          }), _jsx("button", {
+            type: "button",
+            className: "btn btn-sm btn-white",
+            onClick: applyFastProgress,
+            children: "+1 тема · 85%"
+          })]
+        }), _jsxs("div", {
+          className: "attendance-close-meter",
+          children: [_jsxs("span", {
+            children: ["Прошлое ДЗ: ", homeworkMarkedCount, "/", presentReadyCount || 0]
+          }), _jsxs("span", {
+            children: ["Прогресс: ", progressMarkedCount, "/", presentReadyCount || 0]
+          }), _jsxs("span", {
+            children: ["Списание: ", money(chargeTotal)]
+          })]
+        }), _jsx("div", {
+          className: "attendance-presence-list",
+          children: ls.map(s => {
+            const rate = group?.rateOverrides?.[s.id] ?? s.rate;
+            const present = att[s.id] || false;
+            return _jsxs("button", {
+              type: "button",
+              className: `attendance-presence-row ${present ? 'active' : ''}`,
+              onClick: () => setAtt(p => ({
+                ...p,
+                [s.id]: !p[s.id]
+              })),
+              children: [_jsxs("span", {
+                children: [_jsx("strong", {
+                  children: s.name
+                }), _jsx("small", {
+                  children: present ? `${money(s.balance)} → ${money(s.balance - rate)}` : "деньги не спишутся"
+                })]
+              }), _jsx("i", {
+                children: present ? "был" : "нет"
+              })]
+            }, s.id);
+          })
+        })]
+      }), _jsx("section", {
+        className: "attendance-flow-step",
+        children: _jsx("h3", {
+          children: "2. Отчёт родителю и прогресс"
+        })
+      }), _jsx(FormField, {
+        label: "\u0422\u0435\u043C\u0430 \u0443\u0440\u043E\u043A\u0430",
         children: _jsx("input", {
           className: "input",
           value: topic,
@@ -2496,19 +3578,217 @@ function AttendanceModal({
           placeholder: "\u0427\u0442\u043E \u043F\u0440\u043E\u0445\u043E\u0434\u0438\u043B\u0438"
         })
       }), _jsx(FormField, {
-        label: "\u0414\u043E\u043C\u0430\u0448\u043A\u0430",
-        children: _jsx("textarea", {
-          className: "input",
-          value: homework,
-          onChange: e => setHomework(e.target.value),
-          placeholder: "\u0427\u0442\u043E \u0437\u0430\u0434\u0430\u0442\u044C",
-          style: {
-            minHeight: 64,
-            resize: 'vertical'
-          }
+        label: "Новое ДЗ к следующему уроку",
+        children: _jsxs(_Fragment, {
+          children: [_jsx("textarea", {
+            className: "input",
+            value: homework,
+            onChange: e => setHomework(e.target.value),
+            placeholder: "Что задать к следующему уроку",
+            style: {
+              minHeight: 64,
+              resize: 'vertical'
+            }
+          }), _jsx("small", {
+            className: "field-help",
+            children: "\u042D\u0442\u043E \u043F\u043E\u044F\u0432\u0438\u0442\u0441\u044F \u0443 \u0440\u043E\u0434\u0438\u0442\u0435\u043B\u044F \u043A\u0430\u043A \u043D\u043E\u0432\u043E\u0435 \u0414\u0417. \u041F\u0440\u043E\u0448\u043B\u043E\u0435 \u0414\u0417 \u043E\u0442\u043C\u0435\u0447\u0430\u0435\u0442\u0441\u044F \u043D\u0438\u0436\u0435 \u043F\u043E \u043A\u0430\u0436\u0434\u043E\u043C\u0443 \u0443\u0447\u0435\u043D\u0438\u043A\u0443."
+          })]
         })
+      }), lesson.type === 'group' ? _jsx(FormField, {
+        label: "Проверка прошлого ДЗ по ученикам",
+        children: _jsx("div", {
+          className: "attendance-student-parent-list",
+          children: ls.map(s => {
+            const studentStatus = homeworkStatusByStudent[s.id] || 'unset';
+            const studentStatusInfo = HOMEWORK_STATUS[studentStatus] || HOMEWORK_STATUS.unset;
+            const active = sameId(s.id, previewStudentKey);
+            return _jsxs("div", {
+              className: `attendance-student-parent-card ${active ? 'active' : ''}`,
+              children: [_jsxs("div", {
+                className: "attendance-student-parent-head",
+                children: [_jsxs("button", {
+                  type: "button",
+                  onClick: () => setPreviewStudentId(s.id),
+                  children: [_jsx("strong", {
+                    children: s.name
+                  }), _jsx("span", {
+                    children: att[s.id] ? "был на уроке" : "не был на уроке"
+                  })]
+                }), _jsx("b", {
+                  className: `homework-status-pill ${studentStatusInfo.tone}`,
+                  children: studentStatusInfo.short
+                })]
+              }), _jsx("div", {
+                className: "homework-status-grid compact",
+                children: Object.entries(HOMEWORK_STATUS).map(([key, info]) => _jsx("button", {
+                  type: "button",
+                  className: `homework-status-btn ${studentStatus === key ? 'active' : ''} ${info.tone}`,
+                  onClick: () => setStudentHomeworkStatus(s.id, key),
+                  children: info.label
+                }, key))
+              }), _jsx("textarea", {
+                className: "input",
+                value: parentLessonCommentByStudent[s.id] || '',
+                onFocus: () => setPreviewStudentId(s.id),
+                onChange: e => setStudentParentComment(s.id, e.target.value),
+                placeholder: "Комментарий именно для родителя этого ученика",
+                style: {
+                  minHeight: 54,
+                  resize: 'vertical'
+                }
+              })]
+            }, s.id);
+          })
+        })
+      }) : _jsxs(_Fragment, {
+        children: [_jsx(FormField, {
+          label: "\u0414\u0417 \u043F\u0440\u043E\u0448\u043B\u043E\u0433\u043E \u0443\u0440\u043E\u043A\u0430",
+          children: _jsx("div", {
+            className: "homework-status-grid",
+            children: Object.entries(HOMEWORK_STATUS).map(([key, info]) => _jsx("button", {
+              type: "button",
+              className: `homework-status-btn ${homeworkStatus === key ? 'active' : ''} ${info.tone}`,
+              onClick: () => setStudentHomeworkStatus(previewStudentKey, key),
+              children: info.label
+            }, key))
+          })
+        }), _jsx(FormField, {
+          label: "\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439 \u0440\u043E\u0434\u0438\u0442\u0435\u043B\u044E",
+          children: _jsx("textarea", {
+            className: "input",
+            value: previewStudentKey ? parentLessonCommentByStudent[previewStudentKey] || '' : '',
+            onChange: e => setStudentParentComment(previewStudentKey, e.target.value),
+            placeholder: "\u041A\u043E\u0440\u043E\u0442\u043A\u043E: \u0447\u0442\u043E \u043F\u043E\u043B\u0443\u0447\u0438\u043B\u043E\u0441\u044C, \u0433\u0434\u0435 \u043D\u0443\u0436\u043D\u0430 \u043F\u043E\u043C\u043E\u0449\u044C, \u043D\u0430 \u0447\u0442\u043E \u043E\u0431\u0440\u0430\u0442\u0438\u0442\u044C \u0432\u043D\u0438\u043C\u0430\u043D\u0438\u0435",
+            style: {
+              minHeight: 68,
+              resize: 'vertical'
+            }
+          })
+        })]
       }), _jsx(FormField, {
-        label: "\u0417\u0430\u043C\u0435\u0442\u043A\u0430",
+        label: "Прогресс урока",
+        children: _jsx("div", {
+          className: "attendance-progress-list",
+          children: [ls.length > 1 && _jsxs("div", {
+            className: "attendance-progress-bulk",
+            children: [_jsx("span", {
+              children: "Быстро для всех присутствующих"
+            }), _jsxs("div", {
+              children: [[0, 1, 2].map(n => _jsx("button", {
+                type: "button",
+                className: "btn btn-sm btn-white",
+                onClick: () => setAllProgressField('topicsDelta', n),
+                children: n === 0 ? "без тем" : `+${n}`
+              }, n)), [65, 75, 85, 95].map(value => _jsx("button", {
+                type: "button",
+                className: "btn btn-sm btn-white",
+                onClick: () => setAllProgressField('assimilationPercent', value),
+                children: `${value}%`
+              }, value))]
+            })]
+          }), ...ls.map(s => {
+            const current = getStudyProgress(s);
+            const entry = progressByStudent[s.id] || {};
+            const delta = clampCount(entry.topicsDelta);
+            const present = !!att[s.id];
+            const after = Math.max(0, current.completedTopics + (present ? delta : 0));
+            const afterCapped = current.totalTopics ? Math.min(current.totalTopics, after) : after;
+            const percent = current.totalTopics ? clampPercent(afterCapped / current.totalTopics * 100) : null;
+            const active = sameId(s.id, previewStudentKey);
+            return _jsxs("div", {
+              className: `attendance-progress-card ${active ? 'active' : ''} ${present ? '' : 'muted'}`,
+              children: [_jsxs("div", {
+                className: "attendance-progress-head",
+                children: [_jsxs("button", {
+                  type: "button",
+                  onClick: () => setPreviewStudentId(s.id),
+                  children: [_jsx("strong", {
+                    children: s.name
+                  }), _jsx("span", {
+                    children: current.totalTopics ? `${afterCapped}/${current.totalTopics} тем · ${percent}%` : `${afterCapped} тем · общий план не задан`
+                  })]
+                }), _jsx("b", {
+                  children: present ? `+${delta}` : "нет"
+                })]
+              }), _jsxs("div", {
+                className: "attendance-progress-controls",
+                children: [[0, 1, 2].map(n => _jsx("button", {
+                  type: "button",
+                  disabled: !present,
+                  className: `btn btn-sm ${delta === n ? 'btn-black' : 'btn-white'}`,
+                  onClick: () => setStudentProgressField(s.id, 'topicsDelta', n),
+                  children: n === 0 ? "без тем" : `+${n}`
+                }, n)), _jsxs("label", {
+                  className: "attendance-assimilation-row",
+                  children: [_jsx("span", {
+                    children: "усвоение"
+                  }), _jsx("input", {
+                    className: "input",
+                    type: "number",
+                    min: "0",
+                    max: "100",
+                    disabled: !present,
+                    value: entry.assimilationPercent ?? '',
+                    onFocus: () => setPreviewStudentId(s.id),
+                    onChange: e => setStudentProgressField(s.id, 'assimilationPercent', e.target.value),
+                    placeholder: "%"
+                  })]
+                }), _jsx("div", {
+                  className: "attendance-assimilation-presets",
+                  children: [65, 75, 85, 95].map(value => _jsx("button", {
+                    type: "button",
+                    disabled: !present,
+                    className: `btn btn-sm ${clampCount(entry.assimilationPercent) === value ? 'btn-black' : 'btn-white'}`,
+                    onClick: () => setStudentProgressField(s.id, 'assimilationPercent', value),
+                    children: `${value}%`
+                  }, value))
+                })]
+              })]
+            }, s.id);
+          })]
+        })
+      }), _jsxs("div", {
+        className: "attendance-parent-preview",
+        children: [_jsxs("div", {
+          className: "attendance-parent-preview-head",
+          children: [_jsx("span", {
+            children: lesson.type === 'group' && previewStudent ? `Видно родителю: ${previewStudent.name}` : "Видно родителю"
+          }), _jsx("b", {
+            children: parentPreviewComment ? "готово" : "можно не заполнять"
+          })]
+        }), _jsxs("div", {
+          className: "attendance-parent-preview-body",
+          children: [_jsxs("div", {
+            children: [_jsx("strong", {
+              children: "Тема"
+            }), _jsx("span", {
+              children: parentPreviewTopic || "не указана"
+            })]
+          }), _jsxs("div", {
+            children: [_jsx("strong", {
+              children: "Новое ДЗ"
+            }), _jsx("span", {
+              children: parentPreviewHomework || "не задана"
+            })]
+          }), _jsxs("div", {
+            children: [_jsx("strong", {
+              children: "ДЗ прошлого урока"
+            }), _jsx("span", {
+              className: `homework-status-pill ${homeworkStatusInfo.tone}`,
+              children: homeworkStatusInfo.short
+            })]
+          }), _jsxs("div", {
+            children: [_jsx("strong", {
+              children: "Прогресс"
+            }), _jsx("span", {
+              children: previewStudyProgress?.totalTopics ? `${Math.min(previewStudyProgress.totalTopics, previewCompletedAfter)}/${previewStudyProgress.totalTopics} тем · ${previewTheoryAfter}%` : previewTopicsDelta ? `+${previewTopicsDelta} тем` : "без изменений"
+            })]
+          }), _jsx("p", {
+            children: parentPreviewComment || "Если добавить комментарий, родитель увидит его отдельным блоком после сохранения урока."
+          })]
+        })]
+      }), _jsx(FormField, {
+        label: "\u041B\u0438\u0447\u043D\u0430\u044F \u0437\u0430\u043C\u0435\u0442\u043A\u0430 \u0440\u0435\u043F\u0435\u0442\u0438\u0442\u043E\u0440\u0430",
         children: _jsx("textarea", {
           className: "input",
           value: lessonNote,
@@ -2559,37 +3839,6 @@ function AttendanceModal({
             children: ['', 'Слабо', 'Ниже среднего', 'Норм', 'Хорошо', 'Отлично'][rating]
           })]
         })]
-      }), ls.map(s => {
-        const rate = group?.rateOverrides?.[s.id] ?? s.rate;
-        const present = att[s.id] || false;
-        return _jsxs("div", {
-          className: `check-row ${present ? 'checked' : ''}`,
-          onClick: () => setAtt(p => ({
-            ...p,
-            [s.id]: !p[s.id]
-          })),
-          children: [_jsxs("div", {
-            children: [_jsx("div", {
-              style: {
-                fontWeight: 700,
-                textDecoration: present ? 'none' : 'line-through',
-                color: present ? 'var(--black)' : 'var(--text-muted)'
-              },
-              children: s.name
-            }), _jsxs("div", {
-              style: {
-                fontSize: 11,
-                color: 'var(--text-sec)'
-              },
-              children: present ? (s.packageLessons || 0) > 0 ? `${money(s.balance)} \u2192 ${money(s.balance - rate)} · абонемент ${s.packageLessons} \u2192 ${Math.max(0, (s.packageLessons || 0) - 1)} зан.` : `${money(s.balance)} \u2192 ${money(s.balance - rate)}` : "\u0414\u0435\u043D\u044C\u0433\u0438 \u043D\u0435 \u0441\u043F\u0438\u0448\u0443\u0442\u0441\u044F"
-            })]
-          }), _jsx("div", {
-            className: `check-box ${present ? 'checked' : ''}`,
-            children: present && _jsx(IcoCheck, {
-              size: 14
-            })
-          })]
-        }, s.id);
       }), _jsxs("div", {
         className: "modal-actions",
         children: [_jsx("button", {
@@ -2682,6 +3931,629 @@ function LessonDeleteModal({
     })]
   });
 }
+function ParentPortalPanel({
+  student,
+  students,
+  groups,
+  lessons,
+  txs,
+  onSave,
+  onAcceptPaymentNotice,
+  onDismissPaymentNotice
+}) {
+  const [copied, setCopied] = useState(false);
+  const payload = buildParentPortalPayload(student, students, groups, lessons, txs);
+  const portal = payload.portal;
+  const link = portal.token ? parentPortalUrl(portal.token) : '';
+  const notices = (portal.paymentNotices || []).filter(n => n.status !== 'hidden').sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+  const savePatch = patch => onSave(student.id, {
+    ...portal,
+    ...patch
+  });
+  const ensureEnabled = () => savePatch({
+    enabled: true,
+    token: portal.token || createParentPortalToken()
+  });
+  const copyLink = async () => {
+    const token = portal.token || createParentPortalToken();
+    if (!portal.token || !portal.enabled) savePatch({
+      enabled: true,
+      token
+    });
+    await copyTextSafe(parentPortalUrl(token));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  };
+  const option = (key, label, text) => _jsxs("button", {
+    type: "button",
+    className: `parent-option ${portal[key] ? 'active' : ''}`,
+    onClick: () => savePatch({
+      enabled: true,
+      token: portal.token || createParentPortalToken(),
+      [key]: !portal[key]
+    }),
+    children: [_jsx("strong", {
+      children: label
+    }), _jsx("span", {
+      children: text
+    })]
+  }, key);
+  return _jsxs("div", {
+    className: "parent-portal-panel",
+    children: [_jsxs("div", {
+      className: `parent-portal-hero ${portal.enabled ? 'enabled' : ''}`,
+      children: [_jsxs("div", {
+        children: [_jsx("div", {
+          className: "metric-label",
+          children: "Родительская ссылка"
+        }), _jsx("div", {
+          className: "parent-portal-title",
+          children: portal.enabled ? "Доступ включен" : "Доступ выключен"
+        }), _jsx("div", {
+          className: "parent-portal-text",
+          children: "Родитель видит только безопасную выжимку: баланс, оплаты, ДЗ, прогресс и ближайшие уроки."
+        })]
+      }), _jsx("button", {
+        className: `btn btn-sm ${portal.enabled ? 'btn-white' : 'btn-yellow'}`,
+        onClick: portal.enabled ? () => savePatch({
+          enabled: false
+        }) : ensureEnabled,
+        children: portal.enabled ? "Выключить" : "Включить"
+      })]
+    }), portal.enabled && _jsxs(_Fragment, {
+      children: [_jsxs("div", {
+        className: "parent-link-box",
+        children: [_jsx("input", {
+          className: "input",
+          readOnly: true,
+          value: link
+        }), _jsx("button", {
+          className: "btn btn-black",
+          onClick: copyLink,
+          children: copied ? "Скопировано" : "Копировать"
+        }), _jsx("button", {
+          className: "btn btn-white",
+          onClick: () => window.open(link, '_blank'),
+          children: "Открыть"
+        })]
+      }), _jsxs("div", {
+        className: "parent-options-grid",
+        children: [option('showFinance', 'Финансы', 'долг, аванс, объяснение баланса'), option('showPayments', 'Оплаты', 'последние платежи и списания'), option('showHomework', 'Домашки', 'выданные задания и выполнение'), option('showProgress', 'Прогресс', 'темы, рейтинг, динамика'), option('showSchedule', 'Расписание', 'ближайшие занятия'), option('allowPaymentNotice', 'Заявка оплаты', 'родитель сможет сообщить об оплате')]
+      }), _jsx(FormField, {
+        label: "Комментарий родителю",
+        children: _jsx("textarea", {
+          className: "input",
+          value: portal.teacherComment || '',
+          onChange: e => savePatch({
+            teacherComment: e.target.value
+          }),
+          placeholder: "Например: на этой неделе хорошо пошла тема, нужно закрепить ДЗ.",
+          style: {
+            minHeight: 78,
+            resize: 'vertical'
+          }
+        })
+      }), notices.length > 0 && _jsxs("div", {
+        className: "parent-notice-list",
+        children: [_jsxs("div", {
+          className: "parent-preview-head",
+          children: [_jsx("span", {
+            children: "Заявки от родителя"
+          }), _jsxs("strong", {
+            children: [notices.filter(n => n.status === 'new').length, " новых"]
+          })]
+        }), notices.map(n => _jsxs("div", {
+          className: `parent-notice-item ${n.status || 'new'}`,
+          children: [_jsxs("div", {
+            children: [_jsxs("strong", {
+              children: [money(Number(n.amount || 0)), n.status === 'accepted' ? " · принято" : ""]
+            }), _jsx("span", {
+              children: [n.comment || "Родитель сообщил об оплате", n.createdAt ? ` · ${new Date(n.createdAt).toLocaleString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}` : ""]
+            })]
+          }), n.status === 'accepted' ? _jsx("button", {
+            className: "btn btn-sm btn-white",
+            onClick: () => onDismissPaymentNotice(student.id, n.id),
+            children: "Скрыть"
+          }) : _jsxs("div", {
+            className: "parent-notice-actions",
+            children: [_jsx("button", {
+              className: "btn btn-sm btn-green",
+              onClick: () => onAcceptPaymentNotice(student.id, n.id),
+              children: "Принять"
+            }), _jsx("button", {
+              className: "btn btn-sm btn-white",
+              onClick: () => onDismissPaymentNotice(student.id, n.id),
+              children: "Скрыть"
+            })]
+          })]
+        }, n.id))]
+      }), _jsxs("div", {
+        className: "parent-preview-card",
+        children: [_jsxs("div", {
+          className: "parent-preview-head",
+          children: [_jsx("span", {
+            children: "Предпросмотр"
+          }), _jsx("strong", {
+            children: student.name
+          })]
+        }), _jsxs("div", {
+          className: "parent-preview-grid",
+          children: [_jsxs("div", {
+            children: [_jsx("span", {
+              children: "Баланс"
+            }), _jsx("strong", {
+              style: {
+                color: balanceColor(payload.finance.balance)
+              },
+              children: balanceLabel(payload.finance.balance)
+            })]
+          }), _jsxs("div", {
+            children: [_jsx("span", {
+              children: "Следующий урок"
+            }), _jsx("strong", {
+              children: payload.nextLessons[0] ? `${fmtDate(payload.nextLessons[0].date)} ${payload.nextLessons[0].time}` : "не запланирован"
+            })]
+          }), _jsxs("div", {
+            children: [_jsx("span", {
+              children: "Домашки"
+            }), _jsx("strong", {
+              children: payload.homeworkDoneRate == null ? "нет данных" : `${payload.homeworkDoneRate}%`
+            })]
+          }), _jsxs("div", {
+            children: [_jsx("span", {
+              children: "Теория"
+            }), _jsx("strong", {
+              children: payload.theoryPercent == null ? "нет данных" : `${payload.theoryPercent}%`
+            })]
+          })]
+        })]
+      })]
+    })]
+  });
+}
+function ParentPortalPage({
+  student,
+  students,
+  groups,
+  lessons,
+  txs,
+  onPaymentNotice
+}) {
+  if (!student) return _jsxs("div", {
+    className: "parent-public-page",
+    children: [_jsx("main", {
+      className: "parent-public-shell",
+      children: _jsx(EmptyState, {
+        title: "Ссылка недоступна",
+        text: "Доступ мог быть выключен репетитором или ссылка была обновлена."
+      })
+    })]
+  });
+  const payload = buildParentPortalPayload(student, students, groups, lessons, txs);
+  const portal = payload.portal;
+  const [noticeAmount, setNoticeAmount] = useState(String(Math.max(0, Math.abs(Math.min(0, Number(payload.finance.balance || 0)))) || ''));
+  const [noticeComment, setNoticeComment] = useState('');
+  const [noticeSent, setNoticeSent] = useState(false);
+  const payments = txs.filter(tx => sameId(tx.studentId, student.id)).sort((a, b) => txSortKey(b).localeCompare(txSortKey(a))).slice(0, 6);
+  const sendNotice = () => {
+    const amount = Number(noticeAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      alert('Укажите сумму оплаты.');
+      return;
+    }
+    onPaymentNotice(student.id, {
+      id: Date.now() + Math.random(),
+      amount,
+      comment: noticeComment.trim(),
+      status: 'new',
+      createdAt: new Date().toISOString()
+    });
+    setNoticeSent(true);
+  };
+  const financeEvents = payload.finance.events.slice(0, 6).reverse();
+  const maxFinanceDelta = Math.max(1, ...financeEvents.map(ev => Math.abs(ev.delta)));
+  const debtAmount = Math.abs(Math.min(0, Number(payload.finance.balance || 0)));
+  const nextLesson = payload.nextLessons[0];
+  const homeworkStats = payload.homeworkStats || {};
+  const attendanceStats = payload.attendanceStats || {};
+  const homeworkRate = homeworkStats.rate == null ? 'нет данных' : `${homeworkStats.rate}%`;
+  const attendanceRate = attendanceStats.rate == null ? 'нет данных' : `${attendanceStats.rate}%`;
+  const studyProgress = payload.studyProgress || getStudyProgress(student);
+  const theoryRate = payload.theoryPercent == null ? 'нет данных' : `${payload.theoryPercent}%`;
+  const assimilationRate = payload.assimilationPercent == null ? 'нет данных' : `${payload.assimilationPercent}%`;
+  const latestMock = payload.latestMock;
+  const latestMockRate = latestMock ? `${mockTestPercent(latestMock)}%` : 'нет данных';
+  const mockAverageRate = payload.mockAveragePercent == null ? 'нет данных' : `${payload.mockAveragePercent}%`;
+  const parentPrimaryAction = debtAmount ? `К оплате ${money(debtAmount)}` : payload.finance.balance > 0 ? `Предоплата ${money(payload.finance.balance)}` : 'Баланс закрыт';
+  return _jsx("div", {
+    className: "parent-public-page",
+    children: _jsxs("main", {
+      className: "parent-public-shell",
+      children: [_jsxs("section", {
+        className: "parent-public-hero",
+        children: [_jsxs("div", {
+          children: [_jsx("div", {
+            className: "metric-label",
+            children: "Кабинет ученика"
+          }), _jsx("h1", {
+            children: student.name
+          }), _jsx("p", {
+            children: portal.teacherComment || "Здесь собрана актуальная информация по занятиям: баланс, домашние задания, прогресс и ближайшее расписание."
+          })]
+        }), portal.showFinance && _jsxs("div", {
+          className: "parent-balance-card",
+          children: [_jsx("span", {
+            children: "Баланс"
+          }), _jsx("strong", {
+            style: {
+              color: balanceColor(payload.finance.balance)
+            },
+            children: balanceLabel(payload.finance.balance)
+          })]
+        })]
+      }), _jsxs("section", {
+        className: "parent-dashboard",
+        children: [_jsxs("div", {
+          className: "parent-dashboard-head",
+          children: [_jsxs("div", {
+            children: [_jsx("h2", {
+              children: "\u0421\u0432\u043E\u0434\u043A\u0430 \u0434\u043B\u044F \u0440\u043E\u0434\u0438\u0442\u0435\u043B\u044F"
+            }), _jsx("p", {
+              children: "\u0413\u043B\u0430\u0432\u043D\u043E\u0435 \u043F\u043E \u0437\u0430\u043D\u044F\u0442\u0438\u044F\u043C, \u043E\u043F\u043B\u0430\u0442\u0430\u043C \u0438 \u0434\u043E\u043C\u0430\u0448\u043A\u0435 \u043D\u0430 \u043E\u0434\u043D\u043E\u043C \u044D\u043A\u0440\u0430\u043D\u0435."
+            })]
+          }), _jsx("strong", {
+            className: debtAmount ? 'parent-action-badge debt' : 'parent-action-badge ok',
+            children: parentPrimaryAction
+          })]
+        }), _jsxs("div", {
+          className: "parent-kpi-grid",
+          children: [_jsxs("div", {
+            className: "parent-kpi-card",
+            children: [_jsx("span", {
+              children: "\u0421\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0439 \u0443\u0440\u043E\u043A"
+            }), _jsx("strong", {
+              children: nextLesson ? `${fmtDate(nextLesson.date)} ${nextLesson.time}` : '\u043D\u0435\u0442 \u0432 \u0440\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0438'
+            }), _jsx("small", {
+              children: nextLesson ? getLessonSubject(nextLesson, groups) : '\u0440\u0435\u043F\u0435\u0442\u0438\u0442\u043E\u0440 \u0434\u043E\u0431\u0430\u0432\u0438\u0442 \u0434\u0430\u0442\u0443 \u043F\u043E\u0437\u0436\u0435'
+            })]
+          }), _jsxs("div", {
+            className: "parent-kpi-card",
+            children: [_jsx("span", {
+              children: "\u0414\u043E\u043C\u0430\u0448\u043A\u0430"
+            }), _jsx("strong", {
+              children: homeworkRate
+            }), _jsx("small", {
+              children: `${homeworkStats.done || 0} \u0441\u0434\u0435\u043B\u0430\u043D\u043E \u00B7 ${homeworkStats.partial || 0} \u0447\u0430\u0441\u0442\u0438\u0447\u043D\u043E \u00B7 ${homeworkStats.missed || 0} \u043D\u0435 \u0441\u0434\u0435\u043B\u0430\u043D\u043E`
+            })]
+          }), _jsxs("div", {
+            className: "parent-kpi-card",
+            children: [_jsx("span", {
+              children: "\u041F\u043E\u0441\u0435\u0449\u0430\u0435\u043C\u043E\u0441\u0442\u044C"
+            }), _jsx("strong", {
+              children: attendanceRate
+            }), _jsx("small", {
+              children: `${attendanceStats.done || 0} \u043F\u0440\u043E\u0432\u0435\u0434\u0435\u043D\u043E \u00B7 ${attendanceStats.noShow || 0} \u043F\u0440\u043E\u043F\u0443\u0441\u043A\u043E\u0432`
+            })]
+          }), _jsxs("div", {
+            className: "parent-kpi-card",
+            children: [_jsx("span", {
+              children: "Теория"
+            }), _jsx("strong", {
+              children: theoryRate
+            }), _jsx("small", {
+              children: studyProgress.totalTopics ? `${studyProgress.completedTopics} из ${studyProgress.totalTopics} тем` : "заполните отчёт ученика"
+            })]
+          }), _jsxs("div", {
+            className: "parent-kpi-card",
+            children: [_jsx("span", {
+              children: "Усвоение"
+            }), _jsx("strong", {
+              children: assimilationRate
+            }), _jsx("small", {
+              children: studyProgress.focus || "по оценке репетитора"
+            })]
+          }), _jsxs("div", {
+            className: "parent-kpi-card",
+            children: [_jsx("span", {
+              children: "Пробники"
+            }), _jsx("strong", {
+              children: latestMockRate
+            }), _jsx("small", {
+              children: latestMock ? `${fmtDate(latestMock.date)} · среднее ${mockAverageRate}` : "результатов пока нет"
+            })]
+          })]
+        }), _jsxs("div", {
+          className: "parent-chart-grid",
+          children: [_jsxs("div", {
+            className: "parent-chart-card",
+            children: [_jsxs("div", {
+              className: "parent-chart-title",
+              children: [_jsx("strong", {
+                children: "\u0424\u0438\u043D\u0430\u043D\u0441\u044B"
+              }), _jsx("span", {
+                children: payload.finance.events.length ? "\u043F\u043E\u0441\u043B\u0435\u0434\u043D\u0438\u0435 \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0438" : "\u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0439 \u043F\u043E\u043A\u0430 \u043D\u0435\u0442"
+              })]
+            }), financeEvents.length ? financeEvents.map(ev => _jsxs("div", {
+              className: "parent-money-bar",
+              children: [_jsx("span", {
+                children: fmtDate(ev.tx.date)
+              }), _jsx("i", {
+                className: ev.delta > 0 ? 'plus' : 'minus',
+                style: {
+                  width: `${Math.max(10, Math.round(Math.abs(ev.delta) / maxFinanceDelta * 100))}%`
+                }
+              }), _jsx("b", {
+                children: `${ev.delta > 0 ? '+' : '-'}${money(Math.abs(ev.delta))}`
+              })]
+            }, ev.tx.id)) : _jsx("p", {
+              className: "parent-muted",
+              children: "\u041A\u043E\u0433\u0434\u0430 \u043F\u043E\u044F\u0432\u044F\u0442\u0441\u044F \u043E\u043F\u043B\u0430\u0442\u044B \u0438 \u0441\u043F\u0438\u0441\u0430\u043D\u0438\u044F, \u0437\u0434\u0435\u0441\u044C \u0431\u0443\u0434\u0435\u0442 \u0432\u0438\u0434\u043D\u0430 \u0434\u0438\u043D\u0430\u043C\u0438\u043A\u0430."
+            })]
+          }), _jsxs("div", {
+            className: "parent-chart-card",
+            children: [_jsxs("div", {
+              className: "parent-chart-title",
+              children: [_jsx("strong", {
+                children: "\u0414\u043E\u043C\u0430\u0448\u043A\u0430"
+              }), _jsx("span", {
+                children: homeworkStats.total ? `${homeworkStats.total} \u043F\u0440\u043E\u0432\u0435\u0440\u043E\u043A` : "\u043D\u0435\u0442 \u043F\u0440\u043E\u0432\u0435\u0440\u043E\u043A"
+              })]
+            }), _jsxs("div", {
+              className: "parent-stack-chart",
+              children: [_jsx("i", {
+                className: "good",
+                style: {
+                  flexGrow: homeworkStats.done || 0
+                }
+              }), _jsx("i", {
+                className: "warn",
+                style: {
+                  flexGrow: homeworkStats.partial || 0
+                }
+              }), _jsx("i", {
+                className: "bad",
+                style: {
+                  flexGrow: homeworkStats.missed || 0
+                }
+              })]
+            }), _jsxs("div", {
+              className: "parent-chart-legend",
+              children: [_jsx("span", {
+                children: "\u0441\u0434\u0435\u043B\u0430\u043D\u043E"
+              }), _jsx("span", {
+                children: "\u0447\u0430\u0441\u0442\u0438\u0447\u043D\u043E"
+              }), _jsx("span", {
+                children: "\u043D\u0435 \u0441\u0434\u0435\u043B\u0430\u043D\u043E"
+              })]
+            })]
+          })]
+        })]
+      }), portal.showProgress && _jsxs("section", {
+        className: "parent-public-section parent-study-public-section",
+        children: [_jsxs("div", {
+          className: "parent-study-head",
+          children: [_jsxs("div", {
+            children: [_jsx("h2", {
+              children: "Учебный прогресс"
+            }), _jsxs("p", {
+              children: [studyProgress.subject, " · теория, усвоение и пробники"]
+            })]
+          }), _jsx("strong", {
+            children: theoryRate
+          })]
+        }), _jsxs("div", {
+          className: "parent-study-grid",
+          children: [_jsxs("div", {
+            className: "parent-study-main",
+            children: [_jsxs("div", {
+              className: "parent-study-meter-head",
+              children: [_jsx("span", {
+                children: "Темы кодификатора"
+              }), _jsx("b", {
+                children: studyProgress.totalTopics ? `${studyProgress.completedTopics}/${studyProgress.totalTopics}` : "нет данных"
+              })]
+            }), _jsx("div", {
+              className: "parent-study-meter",
+              children: _jsx("i", {
+                style: {
+                  width: `${payload.theoryPercent || 0}%`
+                }
+              })
+            }), _jsxs("p", {
+              children: ["Пройдено теории: ", _jsx("strong", {
+                children: theoryRate
+              }), ". Усвоение по оценке репетитора: ", _jsx("strong", {
+                children: assimilationRate
+              }), "."]
+            }), studyProgress.focus && _jsxs("p", {
+              children: ["Сейчас в фокусе: ", _jsx("strong", {
+                children: studyProgress.focus
+              })]
+            })]
+          }), _jsxs("div", {
+            className: "parent-study-side",
+            children: [_jsxs("div", {
+              children: [_jsx("span", {
+                children: "Последний пробник"
+              }), _jsx("strong", {
+                children: latestMockRate
+              }), _jsx("small", {
+                children: latestMock ? `${fmtDate(latestMock.date)} · ${latestMock.score}/${latestMock.maxScore}` : "пока не добавлен"
+              })]
+            }), _jsxs("div", {
+              children: [_jsx("span", {
+                children: "Среднее по пробникам"
+              }), _jsx("strong", {
+                children: mockAverageRate
+              }), _jsx("small", {
+                children: `${studyProgress.mockTests.length} результатов`
+              })]
+            })]
+          })]
+        }), studyProgress.mockTests.length > 0 && _jsx("div", {
+          className: "parent-mock-list",
+          children: studyProgress.mockTests.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 4).map(test => _jsxs("div", {
+            children: [_jsx("b", {
+              children: `${mockTestPercent(test)}%`
+            }), _jsxs("span", {
+              children: [fmtDate(test.date), " · ", test.score, "/", test.maxScore, test.comment ? ` · ${test.comment}` : ""]
+            })]
+          }, test.id))
+        })]
+      }), payload.parentComments.length > 0 && _jsxs("section", {
+        className: "parent-public-section parent-comment-section",
+        children: [_jsx("h2", {
+          children: "\u041A\u043E\u043C\u043C\u0435\u043D\u0442\u0430\u0440\u0438\u0439 \u043F\u043E\u0441\u043B\u0435 \u0443\u0440\u043E\u043A\u0430"
+        }), payload.parentComments.map(l => {
+          const statusInfo = HOMEWORK_STATUS[l.homeworkStatus || 'unset'] || HOMEWORK_STATUS.unset;
+          return _jsxs("div", {
+            className: "parent-lesson-comment",
+            children: [_jsxs("div", {
+              children: [_jsx("strong", {
+                children: `${fmtDate(l.date)} \u00B7 ${getLessonSubject(l, groups)}`
+              }), _jsx("span", {
+                children: l.parentLessonComment
+              }), _jsxs("div", {
+                className: "parent-lesson-comment-meta",
+                children: [l.topic && _jsxs("em", {
+                  children: ["Тема: ", l.topic]
+                }), l.homework && _jsxs("em", {
+                  children: ["ДЗ: ", l.homework]
+                }), l.homeworkStatus && l.homeworkStatus !== 'unset' && _jsx("b", {
+                  className: `homework-status-pill ${statusInfo.tone}`,
+                  children: statusInfo.short
+                })]
+              })]
+            }), l.rating > 0 && _jsx("b", {
+              className: "parent-rating-pill",
+              children: `${l.rating}/5`
+            })]
+          }, l.id);
+        })]
+      }), portal.showSchedule && _jsxs("section", {
+        className: "parent-public-section",
+        children: [_jsx("h2", {
+          children: "Ближайшие занятия"
+        }), payload.nextLessons.length ? payload.nextLessons.map(l => _jsxs("div", {
+          className: "parent-public-row",
+          children: [_jsxs("div", {
+            children: [_jsx("strong", {
+              children: `${fmtDate(l.date)} ${l.time}`
+            }), _jsx("span", {
+              children: getLessonSubject(l, groups)
+            })]
+          }), _jsx("b", {
+            children: LESSON_STATUS[l.status]?.label || l.status
+          })]
+        }, l.id)) : _jsx("p", {
+          className: "parent-muted",
+          children: "Ближайших уроков пока нет."
+        })]
+      }), portal.showFinance && _jsxs("section", {
+        className: "parent-public-section",
+        children: [_jsx("h2", {
+          children: "Финансы"
+        }), _jsxs("div", {
+          className: "parent-finance-explain",
+          children: [_jsx("strong", {
+            children: balanceLabel(payload.finance.balance)
+          }), _jsx("p", {
+            children: payload.finance.balance < 0 ? buildDebtParentMessage(student, txs, lessons, groups).split('\n').slice(0, 5).join('\n') : "Сейчас долг не отображается. Если была недавняя оплата, она появится после отметки репетитором."
+          })]
+        }), portal.showPayments && payments.map(tx => _jsxs("div", {
+          className: "parent-public-row",
+          children: [_jsxs("div", {
+            children: [_jsx("strong", {
+              children: tx.comment || (tx.type === 'payment' ? "Оплата" : "Списание")
+            }), _jsx("span", {
+              children: fmtDate(tx.date)
+            })]
+          }), _jsx("b", {
+            className: tx.type === 'payment' ? 'balance-plus' : 'balance-minus',
+            children: `${tx.type === 'payment' ? '+' : '-'}${money(tx.amount)}`
+          })]
+        }, tx.id)), portal.allowPaymentNotice && (noticeSent ? _jsx("div", {
+          className: "parent-payment-sent",
+          children: "Заявка отправлена репетитору. Баланс изменится после подтверждения."
+        }) : _jsxs("div", {
+          className: "parent-payment-form",
+          children: [_jsx("input", {
+            className: "input",
+            type: "number",
+            min: "1",
+            placeholder: "Сумма оплаты",
+            value: noticeAmount,
+            onChange: e => setNoticeAmount(e.target.value)
+          }), _jsx("input", {
+            className: "input",
+            placeholder: "Комментарий, если нужно",
+            value: noticeComment,
+            onChange: e => setNoticeComment(e.target.value)
+          }), _jsx("button", {
+            className: "btn btn-yellow btn-full",
+            onClick: sendNotice,
+            children: "Я оплатил(а)"
+          })]
+        }))]
+      }), portal.showHomework && _jsxs("section", {
+        className: "parent-public-section",
+        children: [_jsxs("h2", {
+          children: ["Домашние задания", payload.homeworkDoneRate != null ? ` · ${payload.homeworkDoneRate}%` : ""]
+        }), (() => {
+          const rows = payload.homeworkStatusLessons.length ? payload.homeworkStatusLessons : payload.homeworkLessons;
+          return rows.length ? rows.map(l => {
+            const statusInfo = HOMEWORK_STATUS[l.homeworkStatus || 'unset'] || HOMEWORK_STATUS.unset;
+            return _jsxs("div", {
+              className: "parent-homework-card",
+              children: [_jsxs("div", {
+                children: [_jsx("strong", {
+                  children: `${fmtDate(l.date)} · ${getLessonSubject(l, groups)}`
+                }), _jsx("span", {
+                  children: l.homework || "Статус ДЗ прошлого урока"
+                })]
+              }), _jsx("b", {
+                className: `homework-status-pill ${statusInfo.tone}`,
+                children: statusInfo.short
+              })]
+            }, l.id);
+          }) : _jsx("p", {
+          className: "parent-muted",
+          children: "Домашние задания пока не добавлены."
+          });
+        })()]
+      }), portal.showProgress && _jsxs("section", {
+        className: "parent-public-section",
+        children: [_jsx("h2", {
+          children: "Активность по предметам"
+        }), payload.progress.length ? payload.progress.map(row => _jsxs("div", {
+          className: "parent-progress-row",
+          children: [_jsxs("div", {
+            children: [_jsx("strong", {
+              children: row.subject
+            }), _jsxs("span", {
+              children: [row.lessons, " занятий", row.avg ? ` · средняя оценка ${row.avg.toFixed(1)}` : ""]
+            })]
+          }), _jsx("div", {
+            className: "parent-progress-track",
+            children: _jsx("i", {
+              style: {
+                width: `${Math.min(100, row.lessons * 16)}%`
+              }
+            })
+          })]
+        }, row.subject)) : _jsx("p", {
+          className: "parent-muted",
+          children: "Активность появится после проведённых уроков."
+        })]
+      })]
+    })
+  });
+}
 function StudentDetailModal({
   student,
   lessons,
@@ -2690,24 +4562,35 @@ function StudentDetailModal({
   students,
   onClose,
   onEdit,
+  onProfile,
   onPay,
   onLesson,
   onGroupLesson,
   onPackage,
   onMessage,
-  onArchive
+  onReport,
+  onArchive,
+  onSaveParentPortal,
+  onAcceptPaymentNotice,
+  onDismissPaymentNotice
 }) {
   const [detailTab, setDetailTab] = useState('overview');
-  const ownLessons = lessons.filter(l => l.type === 'individual' ? sameId(l.targetId, student.id) : groups.find(g => sameId(g.id, l.targetId))?.studentIds?.some(id => sameId(id, student.id))).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+  const ownLessons = lessons.filter(l => l.type === 'individual' ? sameId(l.targetId, student.id) : groups.find(g => sameId(g.id, l.targetId))?.studentIds?.some(id => sameId(id, student.id))).map(l => withStudentLessonMeta(l, student.id)).sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
   const completed = ownLessons.filter(l => l.status === 'completed' || l.status === 'no_show');
   const skipped = completed.filter(l => l.attendance?.[student.id] === false || l.status === 'no_show').length;
   const attended = completed.length - skipped;
   const studentTxs = txs.filter(tx => sameId(tx.studentId, student.id));
   const finance = getStudentFinanceSummary(student, txs, lessons, groups);
-  const plannedLessons = ownLessons.filter(l => l.status === 'planned');
-  const homeworkLessons = ownLessons.filter(l => l.homework).slice(0, 12);
-  const phoneClean = (student.phone || '').replace(/\s/g, '');
-  const tabs = [['overview', 'Обзор'], ['balance', 'Баланс'], ['lessons', `Уроки ${ownLessons.length}`], ['payments', `Оплаты ${studentTxs.length}`], ['homework', `ДЗ ${homeworkLessons.length}`], ['availability', 'Доп. расписание'], ['notes', 'Заметки']];
+  const plannedLessons = ownLessons.filter(l => l.status === 'planned').sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const seenLessonRows = new Set();
+  const displayLessons = [...plannedLessons.slice(0, 8), ...completed.slice(0, 22)].filter(l => {
+    const key = `${l.type}-${l.targetId}-${l.date}-${l.time}-${l.status}`;
+    if (seenLessonRows.has(key)) return false;
+    seenLessonRows.add(key);
+    return true;
+  });
+  const homeworkLessons = ownLessons.filter(l => l.homework || l.homeworkStatus && l.homeworkStatus !== 'unset').slice(0, 12);
+  const tabs = [['overview', 'Обзор'], ['lessons', `Занятия ${ownLessons.length}`], ['finance', 'Финансы'], ['parent', 'Родителям'], ['notes', 'Заметки']];
   const memberGroups = groups.filter(g => !g.archived && g.studentIds?.some(id => sameId(id, student.id)));
   return _jsxs(Modal, {
     title: student.name,
@@ -2774,18 +4657,13 @@ function StudentDetailModal({
         onClick: () => onPackage(student),
         children: "\u0410\u0431\u043E\u043D\u0435\u043C\u0435\u043D\u0442"
       }), _jsx("button", {
-        className: "btn btn-white btn-full",
-        onClick: () => onMessage(student),
-        children: "\u0421\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435"
-      }), student.tgId && _jsxs("button", {
-        className: "btn btn-blue btn-full",
-        onClick: () => {
-          const id = String(student.tgId).trim();
-          window.open(id.startsWith('@') ? `https://t.me/${id.slice(1)}` : `https://t.me/${id}`, '_blank');
-        },
-        children: [_jsx(IcoTg, {
-          size: 14
-        }), " Telegram"]
+        className: "btn btn-yellow btn-full",
+        onClick: onProfile,
+        children: "\u041A\u0430\u0440\u0442\u0430"
+      }), _jsx("button", {
+        className: "btn btn-green btn-full",
+        onClick: onReport,
+        children: "Отчёт"
       }), _jsx("button", {
         className: "btn btn-white btn-full",
         onClick: onEdit,
@@ -2794,12 +4672,6 @@ function StudentDetailModal({
         className: `btn btn-full ${student.archived ? 'btn-green' : 'btn-white'}`,
         onClick: () => onArchive(student.id, !student.archived),
         children: student.archived ? 'Вернуть' : 'В архив'
-      }), student.phone && _jsx("button", {
-        className: "btn btn-white btn-full",
-        onClick: () => {
-          window.location.href = `tel:${phoneClean}`;
-        },
-        children: "\u041F\u043E\u0437\u0432\u043E\u043D\u0438\u0442\u044C"
       })]
     }), _jsx("div", {
       className: "detail-tabs",
@@ -2850,7 +4722,7 @@ function StudentDetailModal({
             })]
           }), _jsx("button", {
             className: "btn btn-sm btn-black",
-            onClick: () => setDetailTab('balance'),
+            onClick: () => setDetailTab('finance'),
             children: "\u041F\u043E\u0447\u0435\u043C\u0443?"
           })]
         })]
@@ -2965,7 +4837,7 @@ function StudentDetailModal({
           })]
         });
       })()]
-    }), detailTab === 'balance' && _jsxs(_Fragment, {
+    }), detailTab === 'finance' && _jsxs(_Fragment, {
       children: [_jsxs("div", {
         className: "finance-panel balance-explain-panel",
         children: [_jsx("div", {
@@ -3071,12 +4943,12 @@ function StudentDetailModal({
         }, ev.tx.id))
       })]
     }), detailTab === 'lessons' && _jsx(_Fragment, {
-      children: ownLessons.length === 0 ? _jsx(EmptyState, {
+      children: displayLessons.length === 0 ? _jsx(EmptyState, {
         title: "\u0423\u0440\u043E\u043A\u043E\u0432 \u043F\u043E\u043A\u0430 \u043D\u0435\u0442",
         text: "\u0421\u043E\u0437\u0434\u0430\u0439\u0442\u0435 \u043F\u0435\u0440\u0432\u044B\u0439 \u0443\u0440\u043E\u043A \u043F\u0440\u044F\u043C\u043E \u0438\u0437 \u043F\u0440\u043E\u0444\u0438\u043B\u044F \u0443\u0447\u0435\u043D\u0438\u043A\u0430.",
         action: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u0443\u0440\u043E\u043A",
         onAction: () => onLesson(student.id)
-      }) : ownLessons.slice(0, 30).map(l => _jsxs("div", {
+      }) : displayLessons.slice(0, 30).map(l => _jsxs("div", {
         className: "crm-table-row",
         children: [_jsxs("div", {
           children: [_jsxs("div", {
@@ -3092,9 +4964,23 @@ function StudentDetailModal({
             },
             children: [l.type === 'group' ? getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) : 'Индивидуально', " \xB7 ", LESSON_STATUS[l.status]?.label || l.status]
           })]
-        }), l.homework && _jsx("span", {
-          className: "badge badge-green",
-          children: "\u0414\u0417"
+        }), (l.homework || l.homeworkStatus && l.homeworkStatus !== 'unset') && _jsxs("div", {
+          style: {
+            maxWidth: 240,
+            textAlign: 'right'
+          },
+          children: [_jsx("span", {
+            className: "badge badge-green",
+            children: "\u0414\u0417"
+          }), _jsx("div", {
+            style: {
+              marginTop: 4,
+              fontSize: 11,
+              lineHeight: 1.35,
+              color: 'var(--text-sec)'
+            },
+            children: l.homework || (HOMEWORK_STATUS[l.homeworkStatus] || HOMEWORK_STATUS.unset).label
+          })]
         })]
       }, l.id))
     }), detailTab === 'payments' && _jsx(_Fragment, {
@@ -3132,22 +5018,28 @@ function StudentDetailModal({
         text: "\u041F\u043E\u0441\u043B\u0435 \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u0438\u044F \u0443\u0440\u043E\u043A\u0430 \u0434\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u0437\u0430\u0434\u0430\u043D\u0438\u0435, \u0438 \u043E\u043D\u043E \u043F\u043E\u044F\u0432\u0438\u0442\u0441\u044F \u0432 \u0438\u0441\u0442\u043E\u0440\u0438\u0438 \u0443\u0447\u0435\u043D\u0438\u043A\u0430.",
         action: "\u041D\u0430\u043F\u0438\u0441\u0430\u0442\u044C \u0443\u0447\u0435\u043D\u0438\u043A\u0443",
         onAction: () => onMessage(student)
-      }) : homeworkLessons.map(l => _jsxs("div", {
-        className: "card",
-        style: {
-          padding: 12
-        },
-        children: [_jsxs("div", {
-          className: "label",
-          children: [fmtDate(l.date), " \xB7 ", l.time]
-        }), _jsx("div", {
+      }) : homeworkLessons.map(l => {
+        const statusInfo = HOMEWORK_STATUS[l.homeworkStatus || 'unset'] || HOMEWORK_STATUS.unset;
+        return _jsxs("div", {
+          className: "card homework-detail-card",
           style: {
-            fontSize: 12,
-            lineHeight: 1.6
+            padding: 12
           },
-          children: l.homework
-        })]
-      }, l.id))
+          children: [_jsxs("div", {
+            className: "homework-detail-head",
+            children: [_jsxs("div", {
+              className: "label",
+              children: [fmtDate(l.date), " \xB7 ", l.time]
+            }), l.homeworkStatus && l.homeworkStatus !== 'unset' && _jsx("span", {
+              className: `homework-status-pill ${statusInfo.tone}`,
+              children: statusInfo.label
+            })]
+          }), _jsx("div", {
+            className: "homework-detail-text",
+            children: l.homework || "\u0421\u0442\u0430\u0442\u0443\u0441 \u0414\u0417 \u043F\u0440\u043E\u0448\u043B\u043E\u0433\u043E \u0443\u0440\u043E\u043A\u0430"
+          })]
+        }, l.id);
+      })
     }), detailTab === 'availability' && _jsxs(_Fragment, {
       children: [_jsxs("div", {
         className: "card",
@@ -3206,6 +5098,15 @@ function StudentDetailModal({
           })]
         }, g.id);
       })]
+    }), detailTab === 'parent' && _jsx(ParentPortalPanel, {
+      student: student,
+      students: students,
+      groups: groups,
+      lessons: lessons,
+      txs: txs,
+      onSave: onSaveParentPortal,
+      onAcceptPaymentNotice: onAcceptPaymentNotice,
+      onDismissPaymentNotice: onDismissPaymentNotice
     }), detailTab === 'notes' && _jsxs("div", {
       className: "card",
       style: {
@@ -3233,6 +5134,18 @@ function StudentDetailModal({
         children: student.notes || 'Заметок пока нет'
       }), _jsx("div", {
         className: "label",
+        children: "\u0414\u043E\u0441\u0442\u0443\u043F\u043D\u043E\u0441\u0442\u044C"
+      }), _jsx("div", {
+        style: {
+          whiteSpace: 'pre-wrap',
+          fontSize: 12,
+          lineHeight: 1.7,
+          marginBottom: 12,
+          color: student.availabilityNotes ? 'var(--black)' : 'var(--text-muted)'
+        },
+        children: student.availabilityNotes || "\u0414\u043E\u043F. \u0440\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043D\u0435 \u0437\u0430\u043F\u043E\u043B\u043D\u0435\u043D\u043E"
+      }), _jsx("div", {
+        className: "label",
         children: "\u0421\u0442\u0430\u0432\u043A\u0438 \u043F\u043E \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430\u043C"
       }), _jsx("div", {
         style: {
@@ -3253,6 +5166,305 @@ function StudentDetailModal({
         children: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0437\u0430\u043C\u0435\u0442\u043A\u0438"
       })]
     })]
+  });
+}
+function StudentReportModal({
+  student,
+  students,
+  groups,
+  lessons,
+  txs,
+  onClose,
+  onSave
+}) {
+  const ownLessons = getStudentLessons(student.id, lessons, groups, {
+    includeArchived: true
+  }).map(l => withStudentLessonMeta(l, student.id));
+  const completed = ownLessons.filter(l => l.status === 'completed' || l.status === 'no_show');
+  const homeworkStatusLessons = completed.filter(l => l.homeworkStatus && l.homeworkStatus !== 'unset');
+  const homeworkTotal = homeworkStatusLessons.filter(l => l.homeworkStatus !== 'none').length;
+  const homeworkScore = homeworkStatusLessons.reduce((sum, l) => sum + (l.homeworkStatus === 'done' ? 1 : l.homeworkStatus === 'partial' ? .5 : 0), 0);
+  const homeworkRate = homeworkTotal ? Math.round(homeworkScore / homeworkTotal * 100) : null;
+  const finance = getStudentFinanceSummary(student, txs, lessons, groups);
+  const progress = getStudyProgress(student);
+  const [subject, setSubject] = useState(progress.subject);
+  const [totalTopics, setTotalTopics] = useState(progress.totalTopics || '');
+  const [completedTopics, setCompletedTopics] = useState(progress.completedTopics || '');
+  const [assimilationPercent, setAssimilationPercent] = useState(progress.assimilationPercent ?? '');
+  const [focus, setFocus] = useState(progress.focus || '');
+  const [mockTests, setMockTests] = useState(progress.mockTests);
+  const [mockDate, setMockDate] = useState(getTodayDate());
+  const [mockScore, setMockScore] = useState('');
+  const [mockMax, setMockMax] = useState(100);
+  const [mockComment, setMockComment] = useState('');
+  const totalNum = clampCount(totalTopics);
+  const completedNum = Math.min(totalNum || clampCount(completedTopics), clampCount(completedTopics));
+  const theoryPercent = totalNum ? clampPercent(completedNum / totalNum * 100) : null;
+  const mockAverage = averageMockPercent({
+    mockTests
+  });
+  const addTopics = count => {
+    const next = clampCount(completedTopics) + count;
+    setCompletedTopics(totalNum ? Math.min(totalNum, next) : next);
+  };
+  const addMock = () => {
+    const score = clampCount(mockScore);
+    const maxScore = Math.max(1, clampCount(mockMax || 100));
+    if (!score || score > maxScore) return;
+    setMockTests(p => [{
+      id: Date.now() + Math.random(),
+      date: mockDate || getTodayDate(),
+      title: 'Пробник',
+      score,
+      maxScore,
+      comment: mockComment.trim()
+    }, ...p].slice(0, 24));
+    setMockScore('');
+    setMockComment('');
+  };
+  const removeMock = id => setMockTests(p => p.filter(test => test.id !== id));
+  const submit = e => {
+    e.preventDefault();
+    onSave({
+      studyProgress: {
+        subject: subject.trim() || student.subjects?.[0] || 'Предмет',
+        totalTopics: totalNum,
+        completedTopics: completedNum,
+        assimilationPercent: assimilationPercent === '' ? null : clampPercent(assimilationPercent),
+        focus: focus.trim(),
+        mockTests
+      }
+    });
+  };
+  return _jsx(Modal, {
+    title: `Отчёт · ${student.name}`,
+    onClose: onClose,
+    className: "student-report-modal",
+    children: _jsxs("form", {
+      onSubmit: submit,
+      className: "student-report-form",
+      children: [_jsxs("div", {
+        className: "report-auto-grid",
+        children: [_jsxs("div", {
+          className: "report-auto-card",
+          children: [_jsx("span", {
+            children: "Баланс"
+          }), _jsx("strong", {
+            style: {
+              color: balanceColor(finance.balance)
+            },
+            children: balanceLabel(finance.balance)
+          }), _jsx("small", {
+            children: "из оплат и списаний"
+          })]
+        }), _jsxs("div", {
+          className: "report-auto-card",
+          children: [_jsx("span", {
+            children: "Занятий"
+          }), _jsx("strong", {
+            children: completed.length
+          }), _jsx("small", {
+            children: `${ownLessons.length} всего`
+          })]
+        }), _jsxs("div", {
+          className: "report-auto-card",
+          children: [_jsx("span", {
+            children: "ДЗ"
+          }), _jsx("strong", {
+            children: homeworkRate == null ? "нет" : `${homeworkRate}%`
+          }), _jsx("small", {
+            children: homeworkTotal ? `${homeworkTotal} проверок` : "статусов пока нет"
+          })]
+        }), _jsxs("div", {
+          className: "report-auto-card accent",
+          children: [_jsx("span", {
+            children: "Теория"
+          }), _jsx("strong", {
+            children: theoryPercent == null ? "нет" : `${theoryPercent}%`
+          }), _jsx("small", {
+            children: totalNum ? `${completedNum} из ${totalNum} тем` : "задайте объём"
+          })]
+        })]
+      }), _jsxs("section", {
+        className: "report-section",
+        children: [_jsx("h3", {
+          children: "Теория по кодификатору"
+        }), _jsxs("div", {
+          className: "profile-grid two",
+          children: [_jsx(FormField, {
+            label: "Предмет / направление",
+            children: _jsx("input", {
+              className: "input",
+              value: subject,
+              onChange: e => setSubject(e.target.value),
+              placeholder: "История, общество, математика"
+            })
+          }), _jsx(FormField, {
+            label: "Всего тем в плане",
+            children: _jsx("input", {
+              className: "input",
+              type: "number",
+              min: "0",
+              value: totalTopics,
+              onChange: e => setTotalTopics(e.target.value),
+              placeholder: "Например 120"
+            })
+          }), _jsx(FormField, {
+            label: "Пройдено тем",
+            children: _jsx("input", {
+              className: "input",
+              type: "number",
+              min: "0",
+              value: completedTopics,
+              onChange: e => setCompletedTopics(e.target.value),
+              placeholder: "Например 43"
+            })
+          }), _jsx(FormField, {
+            label: "Усвоение, %",
+            children: _jsx("input", {
+              className: "input",
+              type: "number",
+              min: "0",
+              max: "100",
+              value: assimilationPercent,
+              onChange: e => setAssimilationPercent(e.target.value),
+              placeholder: "Например 78"
+            })
+          })]
+        }), _jsxs("div", {
+          className: "report-quick-row",
+          children: [_jsx("button", {
+            type: "button",
+            className: "btn btn-sm btn-white",
+            onClick: () => addTopics(1),
+            children: "+1 тема"
+          }), _jsx("button", {
+            type: "button",
+            className: "btn btn-sm btn-white",
+            onClick: () => addTopics(2),
+            children: "+2 темы"
+          }), _jsx("button", {
+            type: "button",
+            className: "btn btn-sm btn-white",
+            onClick: () => addTopics(5),
+            children: "+5 тем"
+          }), [50, 65, 75, 85, 95].map(value => _jsx("button", {
+            type: "button",
+            className: `btn btn-sm ${clampCount(assimilationPercent) === value ? 'btn-black' : 'btn-white'}`,
+            onClick: () => setAssimilationPercent(value),
+            children: `${value}%`
+          }, value))]
+        }), _jsxs("div", {
+          className: "report-track-card",
+          children: [_jsxs("div", {
+            children: [_jsx("span", {
+              children: "Пройдено теории"
+            }), _jsx("strong", {
+              children: theoryPercent == null ? "0%" : `${theoryPercent}%`
+            })]
+          }), _jsx("div", {
+            className: "report-track",
+            children: _jsx("i", {
+              style: {
+                width: `${theoryPercent || 0}%`
+              }
+            })
+          })]
+        }), _jsx(FormField, {
+          label: "Что сейчас в фокусе",
+          children: _jsx("textarea", {
+            className: "input",
+            value: focus,
+            onChange: e => setFocus(e.target.value),
+            placeholder: "Например: повторить экономику, добрать аргументацию, закрепить тестовую часть",
+            style: {
+              minHeight: 72,
+              resize: 'vertical'
+            }
+          })
+        })]
+      }), _jsxs("section", {
+        className: "report-section",
+        children: [_jsx("h3", {
+          children: "Пробники"
+        }), _jsxs("div", {
+          className: "report-mock-entry",
+          children: [_jsx("input", {
+            className: "input",
+            type: "date",
+            value: mockDate,
+            onChange: e => setMockDate(e.target.value)
+          }), _jsx("input", {
+            className: "input",
+            type: "number",
+            min: "0",
+            value: mockScore,
+            onChange: e => setMockScore(e.target.value),
+            placeholder: "Балл"
+          }), _jsx("input", {
+            className: "input",
+            type: "number",
+            min: "1",
+            value: mockMax,
+            onChange: e => setMockMax(e.target.value),
+            placeholder: "Макс."
+          }), _jsx("button", {
+            type: "button",
+            className: "btn btn-black btn-full",
+            onClick: addMock,
+            children: "Добавить"
+          })]
+        }), _jsx("textarea", {
+          className: "input",
+          value: mockComment,
+          onChange: e => setMockComment(e.target.value),
+          placeholder: "Короткий комментарий к пробнику",
+          style: {
+            minHeight: 58,
+            resize: 'vertical',
+            marginTop: 8
+          }
+        }), _jsxs("div", {
+          className: "report-mock-summary",
+          children: [_jsxs("strong", {
+            children: ["Среднее: ", mockAverage == null ? "нет данных" : `${mockAverage}%`]
+          }), _jsxs("span", {
+            children: ["Пробников: ", mockTests.length]
+          })]
+        }), _jsx("div", {
+          className: "report-mock-list",
+          children: mockTests.length ? mockTests.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 8).map(test => _jsxs("div", {
+            children: [_jsxs("div", {
+              children: [_jsx("strong", {
+                children: `${mockTestPercent(test)}%`
+              }), _jsxs("span", {
+                children: [fmtDate(test.date), " · ", test.score, "/", test.maxScore, test.comment ? ` · ${test.comment}` : ""]
+              })]
+            }), _jsx("button", {
+              type: "button",
+              className: "btn btn-sm btn-white",
+              onClick: () => removeMock(test.id),
+              children: "убрать"
+            })]
+          }, test.id)) : _jsx("p", {
+            className: "parent-muted",
+            children: "Пробников пока нет."
+          })
+        })]
+      }), _jsxs("div", {
+        className: "modal-actions",
+        children: [_jsx("button", {
+          type: "button",
+          className: "btn btn-white btn-full",
+          onClick: onClose,
+          children: "Отмена"
+        }), _jsx("button", {
+          type: "submit",
+          className: "btn btn-green btn-full",
+          children: "Сохранить отчёт"
+        })]
+      })]
+    })
   });
 }
 function PackageModal({
@@ -4010,7 +6222,7 @@ function ScheduleExportModal({
 
 // ── TIPS MODAL ─────────────────────────────────────────────────────────────────
 const TIPS = [{
-  icon: '💡',
+  icon: 'рџ’Ў',
   title: 'Серии уроков',
   text: 'При создании урока включи "Серия" — приложение автоматически создаст повторяющиеся уроки на несколько недель вперёд. Не нужно добавлять каждый урок вручную.'
 }, {
@@ -4018,35 +6230,35 @@ const TIPS = [{
   title: 'Быстрое закрытие дня',
   text: 'На главном экране кнопка "Закрыть N" сразу отмечает все прошедшие уроки как проведённые с полной посещаемостью. 2 секунды вместо 5 минут.'
 }, {
-  icon: '💸',
+  icon: 'рџ’ё',
   title: 'Абонементы',
   text: 'Абонемент списывает уроки с пакета, а не с баланса. Удобно когда ученик платит сразу за месяц — не нужно следить за суммами.'
 }, {
-  icon: '📊',
+  icon: 'рџ“Љ',
   title: 'Долги на главной',
   text: 'Раздел "Требует внимания" показывает всех должников прямо на главном экране. Оттуда же можно отправить напоминание.'
 }, {
-  icon: '📱',
+  icon: 'рџ“±',
   title: 'Telegram-чат одним нажатием',
   text: 'Заполни Telegram ID или @username в профиле ученика — кнопка "Написать" станет синей и откроет чат напрямую без копирования номера.'
 }, {
-  icon: '🎨',
+  icon: 'рџЋЁ',
   title: 'Смайлы для групп',
-  text: 'Добавь смайл группе (🏛️ 📚 🔢 🌍) — так группы мгновенно различаются в списке, особенно если их много.'
+  text: 'Добавь смайл группе (рџЏ›пёЏ рџ“љ рџ”ў рџЊЌ) — так группы мгновенно различаются в списке, особенно если их много.'
 }, {
-  icon: '💰',
+  icon: 'рџ’°',
   title: 'Разные ставки',
   text: 'В профиле ученика можно задать разные ставки для разных предметов. Например: история 1500 ₽, обществознание 1200 ₽.'
 }, {
-  icon: '📅',
+  icon: 'рџ“…',
   title: 'Экспорт расписания',
   text: 'Кнопка PDF в расписании выгружает таблицу за любой период. Удобно сохранить на месяц или отправить родителям.'
 }, {
-  icon: '🔍',
+  icon: 'рџ”Ќ',
   title: 'Фильтр по предметам',
   text: 'В расписании и списке учеников есть фильтр по предмету — удобно когда ведёшь несколько дисциплин.'
 }, {
-  icon: '✏️',
+  icon: '✏пёЏ',
   title: 'Свои шаблоны сообщений',
   text: 'В окне "Написать" → "⚙ Шаблоны" можно создавать свои тексты с плейсхолдерами {name}, {lessonDate}, {balance}.'
 }];
@@ -4138,6 +6350,214 @@ function TipsModal({
 }
 
 // ── MAIN APP ───────────────────────────────────────────────────────────────────
+const STUDENT_TEXT_IMPORT_SAMPLE = `Ирина; +7 900 111-22-33; История; 1500
+Марк, Анатолий, Ирина | Общество 10 | 1300
+Полина | Английский | 1800`;
+const normalizeImportName = value => String(value || '').replace(/[•*]/g, ' ').replace(/\s+/g, ' ').trim();
+const importNameKey = value => normalizeImportName(value).toLowerCase();
+const extractImportPhone = line => {
+  const match = String(line || '').match(/\+?\d[\d\s()\-]{7,}\d/);
+  return match ? match[0].replace(/\s+/g, ' ').trim() : '';
+};
+const extractImportRate = line => {
+  const safeLine = String(line || '').replace(/\+?\d[\d\s()\-]{7,}\d/g, ' ');
+  const values = [...safeLine.matchAll(/(?:^|[^\d])(\d{3,5})(?:\s*(?:₽|руб|р))?/gi)].map(m => Number(m[1])).filter(n => Number.isFinite(n) && n >= 300 && n <= 20000);
+  return values.length ? values[values.length - 1] : null;
+};
+const cleanImportNamePart = (value, phone = '', rate = null) => {
+  let result = String(value || '');
+  if (phone) result = result.replace(phone, ' ');
+  if (rate) result = result.replace(new RegExp(`\\b${rate}\\b\\s*(?:₽|руб|р)?`, 'i'), ' ');
+  result = result.replace(/\b(?:история|истор|обществознание|общество|русский|математика|английский|другое|группа|класс|урок|руб|р)\b/gi, ' ');
+  result = result.replace(/\b\d{1,2}\s*(?:класс|кл)?\b/gi, ' ');
+  return normalizeImportName(result.replace(/[|;:]/g, ' '));
+};
+const splitImportNames = value => cleanImportNamePart(value).split(/\s*,\s*|\s+и\s+/i).map(normalizeImportName).filter(name => name && /[A-Za-zА-Яа-яЁё]/.test(name));
+const isUsefulGroupName = value => {
+  const text = normalizeImportName(value);
+  if (!text || extractImportPhone(text) || extractImportRate(text)) return false;
+  return /(группа|класс|\d{1,2}|истор|обществ|рус|мат|англ)/i.test(text);
+};
+function buildStudentTextImportPlan(text, existingStudents = [], existingGroups = []) {
+  const lines = String(text || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  const existingByName = new Map(existingStudents.map(s => [importNameKey(s.name), s]).filter(([key]) => key));
+  const draftByName = new Map();
+  const updatesByName = new Map();
+  const matchedIds = new Set();
+  const groupDrafts = [];
+  const skipped = [];
+  const touchStudent = (name, meta) => {
+    const cleanName = normalizeImportName(name);
+    const key = importNameKey(cleanName);
+    if (!key) return null;
+    const existing = existingByName.get(key);
+    if (existing) {
+      matchedIds.add(existing.id);
+      const update = updatesByName.get(key) || {
+        key,
+        id: existing.id,
+        phone: '',
+        subjects: []
+      };
+      if (meta.phone && !existing.phone) update.phone = meta.phone;
+      if (meta.subject && !(existing.subjects || []).includes(meta.subject)) update.subjects = [...new Set([...(update.subjects || []), meta.subject])];
+      updatesByName.set(key, update);
+      return {
+        key,
+        id: existing.id,
+        existing: true
+      };
+    }
+    const current = draftByName.get(key) || {
+      key,
+      name: cleanName,
+      phone: '',
+      rate: DEFAULT_RATE,
+      subjects: []
+    };
+    draftByName.set(key, {
+      ...current,
+      phone: current.phone || meta.phone || '',
+      rate: meta.rate || current.rate || DEFAULT_RATE,
+      subjects: [...new Set([...(current.subjects || []), meta.subject || 'История'])]
+    });
+    return {
+      key,
+      existing: false
+    };
+  };
+  lines.forEach((line, lineIndex) => {
+    const phone = extractImportPhone(line);
+    const rate = extractImportRate(line);
+    const subject = inferSubject(line);
+    const parts = line.split(/[|;\t]/).map(part => part.trim()).filter(Boolean);
+    const namesPart = parts.find(part => splitImportNames(cleanImportNamePart(part, phone, rate)).length) || cleanImportNamePart(line, phone, rate);
+    const names = splitImportNames(cleanImportNamePart(namesPart, phone, rate));
+    if (!names.length) {
+      skipped.push({
+        line,
+        reason: 'не найдено имя',
+        index: lineIndex
+      });
+      return;
+    }
+    const refs = names.map(name => touchStudent(name, {
+      phone: names.length === 1 ? phone : '',
+      rate,
+      subject
+    })).filter(Boolean);
+    if (names.length > 1) {
+      const nameCandidate = parts.find(part => part !== namesPart && isUsefulGroupName(part)) || '';
+      groupDrafts.push({
+        name: normalizeImportName(nameCandidate),
+        subject,
+        rate,
+        studentKeys: refs.map(ref => ref.key),
+        studentNames: names
+      });
+    }
+  });
+  const groupUniq = new Set(existingGroups.map(group => `${importNameKey(getGroupDisplayName(group, existingStudents))}|${(group.studentIds || []).map(String).sort().join(',')}`));
+  const groups = groupDrafts.filter(group => group.studentKeys.length > 1).filter(group => {
+    const signature = `${importNameKey(group.name || group.studentNames.join(','))}|${group.studentKeys.slice().sort().join(',')}`;
+    if (groupUniq.has(signature)) return false;
+    groupUniq.add(signature);
+    return true;
+  });
+  return {
+    totalLines: lines.length,
+    newStudents: [...draftByName.values()],
+    matchedCount: matchedIds.size,
+    existingUpdates: [...updatesByName.values()].filter(update => update.phone || update.subjects.length),
+    groups,
+    skipped
+  };
+}
+function StudentTextImportModal({
+  students,
+  groups,
+  onImport,
+  onClose
+}) {
+  const [text, setText] = useState('');
+  const plan = useMemo(() => buildStudentTextImportPlan(text, students, groups), [text, students, groups]);
+  const canImport = !!text.trim() && (plan.newStudents.length || plan.groups.length || plan.existingUpdates.length);
+  return _jsxs(Modal, {
+    title: "Импорт учеников",
+    onClose: onClose,
+    children: [_jsx("div", {
+      className: "data-modal-note",
+      children: "Вставьте строки из заметок, Excel, Google Sheets или старого приложения. Одна строка — ученик или группа. Несколько имен через запятую создадут группу."
+    }), _jsx("textarea", {
+      className: "input import-textarea",
+      value: text,
+      placeholder: STUDENT_TEXT_IMPORT_SAMPLE,
+      onChange: e => setText(e.target.value)
+    }), _jsxs("div", {
+      className: "import-preview-grid",
+      children: [_jsxs("div", {
+        className: "import-preview-card",
+        children: [_jsx("span", {
+          children: "Новые ученики"
+        }), _jsx("strong", {
+          children: plan.newStudents.length
+        })]
+      }), _jsxs("div", {
+        className: "import-preview-card",
+        children: [_jsx("span", {
+          children: "Найдены в базе"
+        }), _jsx("strong", {
+          children: plan.matchedCount
+        })]
+      }), _jsxs("div", {
+        className: "import-preview-card",
+        children: [_jsx("span", {
+          children: "Группы"
+        }), _jsx("strong", {
+          children: plan.groups.length
+        })]
+      })]
+    }), text.trim() && _jsxs("div", {
+      className: "import-preview-box",
+      children: [_jsx("div", {
+        className: "modal-section-label",
+        children: "Предпросмотр"
+      }), plan.newStudents.length ? _jsx("div", {
+        className: "import-chip-list",
+        children: plan.newStudents.slice(0, 10).map(student => _jsxs("span", {
+          children: [student.name, " · ", student.subjects.join(', '), " · ", money(student.rate)]
+        }, student.key))
+      }) : _jsx("p", {
+        className: "modal-note-text",
+        children: "Новых учеников нет. Совпадения будут использованы для групп и обновления пустых полей."
+      }), plan.groups.length ? _jsx("div", {
+        className: "import-group-list",
+        children: plan.groups.slice(0, 6).map((group, index) => _jsxs("div", {
+          children: [_jsx("strong", {
+            children: group.name || buildGroupAutoName([], [], group.subject)
+          }), _jsx("span", {
+            children: group.studentNames.join(', ')
+          })]
+        }, index))
+      }) : null, plan.skipped.length ? _jsxs("div", {
+        className: "import-skip-note",
+        children: ["Не распознано строк: ", plan.skipped.length]
+      }) : null]
+    }), _jsxs("div", {
+      className: "modal-actions-row",
+      children: [_jsx("button", {
+        className: "btn btn-white btn-full",
+        onClick: () => setText(STUDENT_TEXT_IMPORT_SAMPLE),
+        children: "Вставить пример"
+      }), _jsx("button", {
+        className: "btn btn-black btn-full",
+        disabled: !canImport,
+        onClick: () => onImport(text),
+        children: "Импортировать"
+      })]
+    })]
+  });
+}
 function DataModal({
   stats,
   lastSavedAt,
@@ -4145,6 +6565,7 @@ function DataModal({
   storageWarning,
   onExport,
   onImport,
+  onTextImport,
   onLocalBackup,
   onClose
 }) {
@@ -4199,6 +6620,10 @@ function DataModal({
         className: "btn btn-white btn-full",
         onClick: onImport,
         children: "\u0418\u043C\u043F\u043E\u0440\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0432\u0441\u044E \u0431\u0430\u0437\u0443"
+      }), _jsx("button", {
+        className: "btn btn-white btn-full",
+        onClick: onTextImport,
+        children: "Импорт учеников и групп из текста"
       }), _jsx("button", {
         className: "btn btn-white btn-full",
         onClick: onLocalBackup,
@@ -4419,6 +6844,104 @@ function App() {
     }]);
     setModal(null);
   };
+  const saveParentPortal = (studentId, parentPortal) => {
+    setStudents(p => p.map(s => sameId(s.id, studentId) ? {
+      ...s,
+      parentPortal
+    } : s));
+    if (modal?.type === 'studentDetail' && sameId(modal.payload?.id, studentId)) {
+      setModal({
+        ...modal,
+        payload: {
+          ...modal.payload,
+          parentPortal
+        }
+      });
+    }
+  };
+  const updateStudentPortal = (studentId, updater) => {
+    const currentStudent = students.find(s => sameId(s.id, studentId));
+    if (!currentStudent) return null;
+    const currentPortal = getParentPortalSettings(currentStudent);
+    const nextPortal = updater(currentPortal, currentStudent);
+    setStudents(p => p.map(s => sameId(s.id, studentId) ? {
+      ...s,
+      parentPortal: nextPortal
+    } : s));
+    if (modal?.type === 'studentDetail' && sameId(modal.payload?.id, studentId)) {
+      setModal({
+        ...modal,
+        payload: {
+          ...modal.payload,
+          parentPortal: nextPortal
+        }
+      });
+    }
+    return nextPortal;
+  };
+  const saveParentPaymentNotice = (studentId, notice) => {
+    updateStudentPortal(studentId, portal => ({
+      ...portal,
+      paymentNotices: [notice, ...(portal.paymentNotices || [])].slice(0, 30)
+    }));
+  };
+  const dismissParentPaymentNotice = (studentId, noticeId) => {
+    updateStudentPortal(studentId, portal => ({
+      ...portal,
+      paymentNotices: (portal.paymentNotices || []).map(n => n.id === noticeId ? {
+        ...n,
+        status: 'hidden',
+        hiddenAt: new Date().toISOString()
+      } : n)
+    }));
+  };
+  const acceptParentPaymentNotice = (studentId, noticeId) => {
+    const student = students.find(s => sameId(s.id, studentId));
+    if (!student) return;
+    const portal = getParentPortalSettings(student);
+    const notice = (portal.paymentNotices || []).find(n => n.id === noticeId);
+    const amount = Number(notice?.amount || 0);
+    if (!notice || !Number.isFinite(amount) || amount <= 0) return;
+    const snapS = [...students],
+      snapT = [...txs];
+    const nextState = financeCore.saveTransactionState({
+      students,
+      txs,
+      data: {
+        studentId: student.id,
+        type: 'payment',
+        amount,
+        date: getTodayDate(),
+        comment: notice.comment || 'Оплата по заявке родителя'
+      },
+      createId: Date.now
+    });
+    const nextPortal = {
+      ...portal,
+      paymentNotices: (portal.paymentNotices || []).map(n => n.id === noticeId ? {
+        ...n,
+        status: 'accepted',
+        acceptedAt: new Date().toISOString()
+      } : n)
+    };
+    const nextStudents = nextState.students.map(s => sameId(s.id, studentId) ? {
+      ...s,
+      parentPortal: nextPortal
+    } : s);
+    setStudents(nextStudents);
+    setTxs(nextState.txs);
+    if (modal?.type === 'studentDetail' && sameId(modal.payload?.id, studentId)) {
+      setModal({
+        ...modal,
+        payload: {
+          ...modal.payload,
+          balance: nextStudents.find(s => sameId(s.id, studentId))?.balance ?? modal.payload.balance,
+          parentPortal: nextPortal
+        }
+      });
+    }
+    triggerUndo('Оплата по заявке принята', lessons, snapS, snapT, undefined, 3000);
+  };
   const archiveStudent = (id, archived = true) => {
     setStudents(p => p.map(s => sameId(s.id, id) ? {
       ...s,
@@ -4503,7 +7026,7 @@ function App() {
     const snapS = [...students],
       snapT = [...txs];
     const student = students.find(s => sameId(s.id, tx.studentId));
-    recordDeletion(`РћРїРµСЂР°С†РёСЏ ${student?.name || 'СѓС‡РµРЅРёРєР°'} ${money(tx.amount)}`, () => {
+    recordDeletion(`Операция ${student?.name || 'ученика'} ${money(tx.amount)}`, () => {
       setStudents(snapS);
       setTxs(snapT);
     });
@@ -4514,7 +7037,7 @@ function App() {
     });
     setStudents(nextState.students);
     setTxs(nextState.txs);
-    triggerUndo('РћРїРµСЂР°С†РёСЏ СѓРґР°Р»РµРЅР°', lessons, snapS, snapT);
+    triggerUndo('Операция удалена', lessons, snapS, snapT);
   };
   const confirmLessonConflicts = (items, ignoreIds = null) => {
     const arr = Array.isArray(items) ? items : [items];
@@ -4596,7 +7119,7 @@ function App() {
       lessonsCount,
       amount,
       date: getTodayDate(),
-      comment: `РђР±РѕРЅРµРјРµРЅС‚: ${lessonsCount} Р·Р°РЅ.`,
+      comment: `РђР±РѕРЅРµРјент: ${lessonsCount} зан.`,
       createId: Date.now
     });
     setStudents(nextState.students);
@@ -4753,7 +7276,8 @@ function App() {
       lessonDateLabel: fmtDate(lesson.date),
       createId: index => Date.now() + index + Math.random()
     });
-    setStudents(nextState.students);
+    const nextStudentsWithProgress = applyLessonStudyProgressState(nextState.students, lesson.progressByStudent || {}, meta.progressByStudent || {}, newAtt);
+    setStudents(nextStudentsWithProgress);
     setTxs(nextState.txs);
     setLessons(p => p.map(l => l.id === lessonId ? {
       ...l,
@@ -4907,6 +7431,57 @@ function App() {
     };
     input.click();
   };
+  const applyStudentTextImport = text => {
+    const plan = buildStudentTextImportPlan(text, students, groups);
+    const hasImport = plan.newStudents.length || plan.groups.length || plan.existingUpdates.length;
+    if (!hasImport) {
+      alert('Не удалось найти новых учеников или групп. Проверьте, что в строках есть имена.');
+      return;
+    }
+    const stamp = Date.now();
+    const newStudents = plan.newStudents.map((draft, index) => ({
+      id: stamp + index,
+      name: draft.name,
+      rate: normalizeMoneyInput(draft.rate, DEFAULT_RATE),
+      phone: draft.phone || '',
+      balance: 0,
+      archived: false,
+      packageLessons: 0,
+      subjects: draft.subjects?.length ? draft.subjects : ['История'],
+      lessonRates: {}
+    }));
+    const keyToId = new Map(students.map(student => [importNameKey(student.name), student.id]).filter(([key]) => key));
+    newStudents.forEach(student => keyToId.set(importNameKey(student.name), student.id));
+    const updatesById = new Map(plan.existingUpdates.map(update => [String(update.id), update]));
+    const nextExistingStudents = students.map(student => {
+      const update = updatesById.get(String(student.id));
+      if (!update) return student;
+      const subjects = [...new Set([...(student.subjects || (student.subject ? [student.subject] : [])), ...(update.subjects || [])])];
+      return {
+        ...student,
+        phone: student.phone || update.phone || '',
+        subjects: subjects.length ? subjects : ['История']
+      };
+    });
+    const newGroups = plan.groups.map((draft, index) => {
+      const studentIds = draft.studentKeys.map(key => keyToId.get(key)).filter(id => id != null);
+      return {
+        id: stamp + 1000 + index,
+        name: draft.name || '',
+        emoji: randomGroupEmoji(),
+        subject: draft.subject || 'История',
+        archived: false,
+        studentIds,
+        rateOverrides: draft.rate ? Object.fromEntries(studentIds.map(id => [id, normalizeMoneyInput(draft.rate, DEFAULT_RATE)])) : {}
+      };
+    }).filter(group => group.studentIds.length > 1);
+    setStudents([...nextExistingStudents, ...newStudents]);
+    setGroups([...groups, ...newGroups]);
+    setStudentsView(newGroups.length ? 'groups' : 'students');
+    setTab('students');
+    setModal(null);
+    alert(`Импорт завершен.\nНовые ученики: ${newStudents.length}\nОбновлено совпадений: ${plan.existingUpdates.length}\nГруппы: ${newGroups.length}`);
+  };
   const exportSchedulePdf = (fromDate, toDate) => {
     const filtered = lessons.filter(l => l.date >= fromDate && l.date <= toDate).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
     const getName = l => l.type === 'group' ? getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) : students.find(s => sameId(s.id, l.targetId))?.name || '?';
@@ -4967,6 +7542,29 @@ function App() {
     }));
   };
   const getLessonName = l => l.type === 'group' ? getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) : students.find(s => sameId(s.id, l.targetId))?.name || '?';
+  const openLessonCard = l => {
+    if (!l) return;
+    if (l.status === 'completed') {
+      setModal({
+        type: 'attendance',
+        payload: l
+      });
+      return;
+    }
+    if (l.status === 'planned') {
+      setModal({
+        type: 'lesson',
+        payload: {
+          lesson: l
+        }
+      });
+      return;
+    }
+    setModal({
+      type: 'lessonStatus',
+      payload: l
+    });
+  };
 
   // ── PAGES ──────────────────────────────────────────────────────────────────
 
@@ -4984,7 +7582,10 @@ function App() {
     const earnedToday = todayTxs.filter(tx => tx.type === 'payment').reduce((s, tx) => s + tx.amount, 0);
     const chargedToday = todayTxs.filter(tx => tx.type === 'charge').reduce((s, tx) => s + tx.amount, 0);
     const futureLessons = lessons.filter(l => l.status === 'planned' && l.date >= getTodayDate());
-    const attention = [...activeStudents.filter(s => s.balance < 0).slice(0, 4).map(s => ({
+    const lowPackages = activeStudents.filter(s => (s.packageLessons || 0) === 1).length;
+    const todayNotes = todayLessons.filter(l => l.lessonNote).length;
+    const nextUpcomingLesson = nextLesson || [...futureLessons].sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`))[0];
+    const attention = [...activeStudents.filter(s => s.balance < 0).slice(0, 3).map(s => ({
       kind: 'Долг',
       text: `${s.name}: ${money(Math.abs(s.balance))}`,
       student: s
@@ -4996,32 +7597,52 @@ function App() {
       kind: 'Нет уроков',
       text: s.name,
       student: s
-    }))].slice(0, 6);
+    }))].slice(0, 5);
     const actionItems = [{
       key: 'close',
       label: 'Закрыть прошедшие уроки',
       count: dueToday.length,
-      tone: dueToday.length ? 'hot' : 'quiet',
+      tone: 'hot',
       action: closeTodayLessons
     }, {
       key: 'debt',
       label: 'Написать должникам',
       count: debtors,
-      tone: debtors ? 'hot' : 'quiet',
+      tone: 'hot',
       action: () => setTab('finance')
+    }, nextUpcomingLesson && {
+      key: 'next',
+      label: `${fmtDate(nextUpcomingLesson.date)} · ${getLessonName(nextUpcomingLesson)}`,
+      count: nextUpcomingLesson.time,
+      tone: 'warn',
+      action: () => openLessonCard(nextUpcomingLesson)
     }, {
       key: 'packages',
       label: 'Пополнить абонементы',
-      count: activeStudents.filter(s => (s.packageLessons || 0) === 1).length,
-      tone: activeStudents.some(s => (s.packageLessons || 0) === 1) ? 'warn' : 'quiet',
+      count: lowPackages,
+      tone: 'warn',
       action: () => setTab('finance')
     }, {
       key: 'notes',
       label: 'Уроки с пометками',
-      count: todayLessons.filter(l => l.lessonNote).length,
-      tone: todayLessons.some(l => l.lessonNote) ? 'warn' : 'quiet',
+      count: todayNotes,
+      tone: 'warn',
       action: () => setTab('schedule')
-    }];
+    }].filter(item => item && (item.key === 'next' || Number(item.count) > 0)).slice(0, 3);
+    if (!actionItems.length) {
+      actionItems.push({
+        key: 'add',
+        label: 'Добавить урок на сегодня',
+        count: '+',
+        tone: 'warn',
+        action: () => setModal({
+          type: 'lesson',
+          payload: {
+            date: getTodayDate()
+          }
+        })
+      });
+    }
     // Active lesson detection
     const currentLesson = todayLessons.find(l => {
       if (l.status !== 'planned') return false;
@@ -5075,19 +7696,25 @@ function App() {
             gap: 8,
             alignItems: 'flex-start'
           },
-          children: [debt > 0 && _jsxs("div", {
+          children: [debt > 0 && _jsxs("button", {
+            type: "button",
+            className: "today-debt-pill",
+            onClick: () => setTab('finance'),
             style: {
-              background: 'var(--red)',
+              background: 'var(--bg-danger)',
               border: 'var(--border)',
+              borderColor: 'color-mix(in srgb, var(--red) 54%, var(--border-light))',
               borderRadius: 4,
               padding: '8px 12px',
-              boxShadow: 'var(--shadow)'
+              boxShadow: 'none',
+              textAlign: 'left',
+              cursor: 'pointer'
             },
             children: [_jsx("div", {
               style: {
                 fontFamily: 'Unbounded,cursive',
                 fontSize: 9,
-                color: '#fff',
+                color: 'var(--red)',
                 textTransform: 'uppercase'
               },
               children: "\u0414\u043E\u043B\u0433\u0438"
@@ -5096,13 +7723,13 @@ function App() {
                 fontFamily: 'Unbounded,cursive',
                 fontSize: 16,
                 fontWeight: 900,
-                color: '#fff'
+                color: 'var(--black)'
               },
               children: [debt.toLocaleString(), " \u20BD"]
             }), _jsxs("div", {
               style: {
                 fontSize: 10,
-                color: 'rgba(255,255,255,.8)'
+                color: 'var(--text-sec)'
               },
               children: [debtors, " \u0447\u0435\u043B."]
             })]
@@ -5166,7 +7793,7 @@ function App() {
         className: "today-command-panel",
         children: [_jsx("div", {
           className: "today-command-title",
-          children: "\u0421\u0435\u0433\u043E\u0434\u043D\u044F \u043D\u0430\u0434\u043E \u0441\u0434\u0435\u043B\u0430\u0442\u044C"
+          children: "\u0424\u043E\u043A\u0443\u0441 \u0434\u043D\u044F"
         }), _jsx("div", {
           className: "today-command-grid",
           children: actionItems.map(item => _jsxs("button", {
@@ -5180,7 +7807,7 @@ function App() {
             })]
           }, item.key))
         })]
-      }), _jsx("div", {
+      }), dueToday.length > 0 && _jsx("div", {
         className: "card today-close-card",
         children: _jsxs("div", {
           className: "today-close-row",
@@ -5191,24 +7818,23 @@ function App() {
               children: "\u0417\u0430\u043A\u0440\u044B\u0442\u0438\u0435 \u0434\u043D\u044F"
             }), _jsx("div", {
               className: "today-close-text",
-              children: nextLesson ? _jsxs(_Fragment, {
-                children: ["\u0421\u043B\u0435\u0434\u0443\u044E\u0449\u0438\u0439: ", _jsx("strong", {
-                  children: nextLesson.time
-                }), " \xB7 ", getLessonName(nextLesson)]
-              }) : 'Все уроки на сегодня обработаны'
+            children: _jsxs(_Fragment, {
+              children: ["\u041D\u0443\u0436\u043D\u043E \u0437\u0430\u043A\u0440\u044B\u0442\u044C: ", _jsx("strong", {
+                children: dueToday.length
+              }), " \u0443\u0440."]
+            })
             }), _jsxs("div", {
               className: "today-close-meta",
               children: ["\u041E\u043F\u043B\u0430\u0442\u044B: ", money(earnedToday), " \xB7 \u0441\u043F\u0438\u0441\u0430\u043D\u0438\u044F: ", money(chargedToday)]
             })]
           }), _jsxs("button", {
-            className: `btn btn-sm ${dueToday.length ? 'btn-green' : 'btn-white'}`,
-            disabled: !dueToday.length,
+            className: "btn btn-sm btn-green",
             onClick: closeTodayLessons,
-            children: ["\u0417\u0430\u043A\u0440\u044B\u0442\u044C ", dueToday.length || '']
+            children: ["\u0417\u0430\u043A\u0440\u044B\u0442\u044C ", dueToday.length]
           })]
         })
       }), attention.length > 0 && _jsxs("div", {
-        className: "card",
+        className: "card today-attention-card",
         style: {
           padding: 12,
           marginBottom: 16
@@ -5357,6 +7983,7 @@ function App() {
         }
         if (!upcoming.length) return null;
         return _jsxs("div", {
+          className: "today-upcoming",
           style: {
             marginTop: 20
           },
@@ -5368,10 +7995,11 @@ function App() {
               marginBottom: 10
             },
             children: "\u0411\u041B\u0418\u0416\u0410\u0419\u0428\u0418\u0415"
-          }), upcoming.map(({
+          }), upcoming.slice(0, 1).map(({
             date,
             lessons: ls
           }) => _jsxs("div", {
+            className: "today-upcoming-day",
             style: {
               marginBottom: 8
             },
@@ -5388,7 +8016,7 @@ function App() {
                 day: 'numeric',
                 month: 'short'
               })
-            }), ls.map(l => _jsx(LessonCard, {
+            }), ls.slice(0, 1).map(l => _jsx(LessonCard, {
               lesson: l,
               name: getLessonName(l),
               compact: true,
@@ -5551,10 +8179,7 @@ function App() {
                   const sub = getLessonSubject(l, groups);
                   return _jsxs("article", {
                     className: `mobile-agenda-card ${l.type === 'group' ? 'group' : 'individual'} status-${l.status} ${isFinalLesson(l) ? 'final' : ''}`,
-                    onClick: () => setModal({
-                      type: l.status === 'planned' || l.status === 'completed' ? 'attendance' : 'lessonStatus',
-                      payload: l
-                    }),
+                    onClick: () => openLessonCard(l),
                     children: [_jsx("div", {
                       className: "mobile-agenda-time",
                       children: l.time
@@ -5781,10 +8406,7 @@ function App() {
                               e.dataTransfer.setData('text/lesson-id', String(l.id));
                               e.dataTransfer.effectAllowed = 'move';
                             },
-                            onClick: () => setModal({
-                              type: l.status === 'planned' || l.status === 'completed' ? 'attendance' : 'lessonStatus',
-                              payload: l
-                            }),
+                            onClick: () => openLessonCard(l),
                             className: `schedule-lesson-cell ${done ? 'done' : 'planned'} ${l.type === 'group' ? 'group' : 'individual'} ${hasConflict ? 'conflict' : ''}`,
                             children: [(() => {
                               const stList = getLessonStudents(l, students, groups);
@@ -5928,7 +8550,7 @@ function App() {
       const monthCellName = l => getLessonName(l).replace(/\s*\([^)]*\)\s*$/, '');
       const monthCellShortName = l => {
         const name = monthCellName(l).trim();
-        const match = name.match(/^([A-Za-zА-Яа-яЁё]+)\s*(\d+)?/);
+        const match = name.match(/^([A-Za-z\u0400-\u04FF]+)\s*(\d+)?/);
         if (!match) return name.slice(0, 4);
         return `${match[1].slice(0, 1).toUpperCase()}${match[2] || ''}`;
       };
@@ -6634,7 +9256,7 @@ function App() {
 
   // FINANCE PAGE (with full analytics, deduplication-safe)
   const PageFinance = () => {
-    const [finTab, setFinTab] = useState('control'); // 'control' | 'analytics'
+    const [finTab, setFinTab] = useState('control'); // 'control' | 'analytics' | 'trust'
     const [analyticsPeriod, setAnalyticsPeriod] = useState('current_month');
     const [txStudentFilter, setTxStudentFilter] = useState('all');
     const [txTypeFilter, setTxTypeFilter] = useState('all');
@@ -6672,13 +9294,13 @@ function App() {
         txs,
         studentId,
         date: getTodayDate(),
-        comment: 'Р‘С‹СЃС‚СЂР°СЏ РѕРїР»Р°С‚Р° РґРѕР»РіР°',
+        comment: 'Быстрая оплата долга',
         createId: Date.now
       });
       if (!nextState.tx) return;
       setStudents(nextState.students);
       setTxs(nextState.txs);
-      triggerUndo('РћРїР»Р°С‚Р° РґРѕР±Р°РІР»РµРЅР°', lessons, snapS, snapT, undefined, 3000);
+      triggerUndo('Оплата добавлена', lessons, snapS, snapT, undefined, 3000);
     };
 
     // ── ANALYTICS ───────────────────────────────────────────────────────────
@@ -7102,7 +9724,7 @@ function App() {
       }), activeStudents.length > 0 && _jsxs("div", {
         className: "finance-control-grid",
         children: [_jsxs("div", {
-          className: "finance-panel finance-trust-panel",
+          className: "finance-panel finance-trust-panel finance-control-trust-preview",
           children: [_jsx("div", {
             className: "metric-label",
             children: "\u0414\u043E\u0432\u0435\u0440\u0438\u0435 \u043A \u0431\u0430\u043B\u0430\u043D\u0441\u0430\u043C"
@@ -7473,8 +10095,90 @@ function App() {
             children: [_jsx(IcoPlus, {
               size: 13
             }), " \u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u0431\u044D\u043A\u0430\u043F"]
+          }), _jsxs("button", {
+            className: "btn btn-sm btn-white btn-full",
+            style: {
+              gridColumn: '1/-1'
+            },
+            onClick: () => setModal({
+              type: 'studentTextImport'
+            }),
+            children: [_jsx(IcoPlus, {
+              size: 13
+            }), " Импорт учеников из текста"]
           })]
         })]
+      })]
+    });
+    const TrustTab = () => _jsxs("div", {
+      className: "finance-trust-page",
+      children: [_jsx("div", {
+        className: "finance-section-title",
+        children: "\u0414\u041E\u0412\u0415\u0420\u0418\u0415 \u041A \u0411\u0410\u041B\u0410\u041D\u0421\u0410\u041C"
+      }), _jsxs("div", {
+        className: "finance-split-grid finance-trust-overview",
+        children: [_jsxs("div", {
+          className: "finance-panel finance-trust-panel",
+          children: [_jsx("div", {
+            className: "metric-label",
+            children: "\u0420\u0430\u0441\u0448\u0438\u0444\u0440\u043E\u0432\u0430\u043D\u043E"
+          }), _jsx("div", {
+            className: "finance-trust-score",
+            children: balanceSummaries.filter(x => x.finance.hasHistory || x.finance.balance !== 0).length
+          }), _jsx("div", {
+            className: "metric-sub",
+            children: "\u0443\u0447\u0435\u043D\u0438\u043A\u043E\u0432, \u0433\u0434\u0435 \u0431\u0430\u043B\u0430\u043D\u0441 \u043C\u043E\u0436\u043D\u043E \u043E\u0431\u044A\u044F\u0441\u043D\u0438\u0442\u044C \u043F\u043E \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u044F\u043C"
+          })]
+        }), _jsxs("div", {
+          className: "finance-panel",
+          children: [_jsx("div", {
+            className: "metric-label",
+            children: "\u041F\u043E\u0441\u043B\u0435\u0434\u043D\u0438\u0435 \u0434\u0435\u043D\u0435\u0436\u043D\u044B\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u044F"
+          }), recentMoneyEvents.length ? recentMoneyEvents.map(tx => {
+            const s = students.find(st => sameId(st.id, tx.studentId));
+            const meta = getTxMeta(tx);
+            return _jsxs("div", {
+              className: "finance-mini-row static",
+              children: [_jsxs("span", {
+                children: [s?.name || "\u0423\u0434\u0430\u043B\u0451\u043D", " \xB7 ", meta.title]
+              }), _jsx("strong", {
+                style: {
+                  color: tx.type === 'payment' ? 'var(--green)' : 'var(--red)'
+                },
+                children: `${tx.type === 'payment' ? '+' : '-'}${money(tx.amount)}`
+              })]
+            }, tx.id);
+          }) : _jsx("div", {
+            className: "metric-sub",
+            children: "\u041E\u043F\u0435\u0440\u0430\u0446\u0438\u0439 \u043F\u043E\u043A\u0430 \u043D\u0435\u0442"
+          })]
+        })]
+      }), _jsx("div", {
+        className: "finance-section-title",
+        children: "\u0411\u0410\u041B\u0410\u041D\u0421\u042B \u0423\u0427\u0415\u041D\u0418\u041A\u041E\u0412"
+      }), _jsx("div", {
+        className: "finance-panel finance-balance-trust-list",
+        children: balanceSummaries.length ? balanceSummaries.map(({
+          student: s,
+          finance
+        }) => _jsxs("button", {
+          className: "finance-mini-row",
+          onClick: () => setModal({
+            type: 'studentDetail',
+            payload: s
+          }),
+          children: [_jsxs("span", {
+            children: [s.name, finance.hasHistory ? " \xB7 \u0435\u0441\u0442\u044C \u0438\u0441\u0442\u043E\u0440\u0438\u044F" : " \xB7 \u043D\u0443\u0436\u043D\u0430 \u0438\u0441\u0442\u043E\u0440\u0438\u044F"]
+          }), _jsx("strong", {
+            style: {
+              color: balanceColor(finance.balance)
+            },
+            children: balanceLabel(finance.balance)
+          })]
+        }, s.id)) : _jsx("div", {
+          className: "metric-sub",
+          children: "\u0423\u0447\u0435\u043D\u0438\u043A\u043E\u0432 \u043F\u043E\u043A\u0430 \u043D\u0435\u0442"
+        })
       })]
     });
     const AnalyticsTab = () => _jsxs("div", {
@@ -7914,7 +10618,7 @@ function App() {
         className: "finance-panel finance-risk-panel",
         children: [_jsx("div", {
           className: "finance-section-title compact",
-          children: "УЧЕНИКИ С РИСКОМ ПО ДЕНЬГАМ"
+          children: "УЧЕНИКИ С Р РСКОМ ПО ДЕНЬГАМ"
         }), riskRows.length ? _jsx("div", {
           className: "finance-risk-list",
           children: riskRows.map(row => _jsxs("button", {
@@ -8306,11 +11010,15 @@ function App() {
           onClick: () => setFinTab('control'),
           children: "\u041A\u043E\u043D\u0442\u0440\u043E\u043B\u044C"
         }), _jsx("button", {
+          className: `toggle-opt ${finTab === 'trust' ? 'active' : ''}`,
+          onClick: () => setFinTab('trust'),
+          children: "\u0414\u043E\u0432\u0435\u0440\u0438\u0435"
+        }), _jsx("button", {
           className: `toggle-opt ${finTab === 'analytics' ? 'active' : ''}`,
           onClick: () => setFinTab('analytics'),
           children: "\u0410\u043D\u0430\u043B\u0438\u0442\u0438\u043A\u0430"
         })]
-      }), finTab === 'control' ? _jsx(ControlTab, {}) : _jsx(AnalyticsTab, {})]
+      }), finTab === 'control' ? _jsx(ControlTab, {}) : finTab === 'trust' ? _jsx(TrustTab, {}) : _jsx(AnalyticsTab, {})]
     });
   };
   const dataStats = {
@@ -8331,6 +11039,21 @@ function App() {
     },
     children: "\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430..."
   });
+  const parentToken = new URLSearchParams(window.location.search).get('parent');
+  if (parentToken) {
+    const parentStudent = students.find(s => {
+      const portal = getParentPortalSettings(s);
+      return portal.enabled && portal.token === parentToken;
+    });
+    return _jsx(ParentPortalPage, {
+      student: parentStudent || null,
+      students: students,
+      groups: groups,
+      lessons: lessons,
+      txs: txs,
+      onPaymentNotice: saveParentPaymentNotice
+    });
+  }
   return _jsxs("div", {
     children: [_jsx(UndoToast, {
       pendingUndo: pendingUndo,
@@ -8419,10 +11142,7 @@ function App() {
         type: 'groupDetail',
         payload: g
       }),
-      onOpenLesson: l => setModal({
-        type: l.status === 'planned' || l.status === 'completed' ? 'attendance' : 'lessonStatus',
-        payload: l
-      })
+      onOpenLesson: openLessonCard
     }), showNotifs && _jsx("div", {
       style: {
         position: 'fixed',
@@ -8547,6 +11267,14 @@ function App() {
       student: modal.payload,
       onClose: () => setModal(null),
       onSave: saveStudent
+    }), modal?.type === 'studentProfile' && _jsx(StudentProfileModal, {
+      student: modal.payload,
+      students: students,
+      groups: groups,
+      lessons: lessons,
+      txs: txs,
+      onClose: () => setModal(null),
+      onSave: saveStudent
     }), modal?.type === 'studentDetail' && _jsx(StudentDetailModal, {
       student: modal.payload,
       students: students,
@@ -8556,6 +11284,14 @@ function App() {
       onClose: () => setModal(null),
       onEdit: () => setModal({
         type: 'student',
+        payload: modal.payload
+      }),
+      onProfile: () => setModal({
+        type: 'studentProfile',
+        payload: modal.payload
+      }),
+      onReport: () => setModal({
+        type: 'studentReport',
         payload: modal.payload
       }),
       onPay: studentId => {
@@ -8600,7 +11336,18 @@ function App() {
           mode
         }
       }),
-      onArchive: archiveStudent
+      onArchive: archiveStudent,
+      onSaveParentPortal: saveParentPortal,
+      onAcceptPaymentNotice: acceptParentPaymentNotice,
+      onDismissPaymentNotice: dismissParentPaymentNotice
+    }), modal?.type === 'studentReport' && _jsx(StudentReportModal, {
+      student: modal.payload,
+      students: students,
+      groups: groups,
+      lessons: lessons,
+      txs: txs,
+      onClose: () => setModal(null),
+      onSave: saveStudent
     }), modal?.type === 'transaction' && _jsx(TransactionModal, {
       tx: modal.payload,
       students: students,
@@ -8667,7 +11414,15 @@ function App() {
       storageWarning: storageWarning,
       onExport: exportJson,
       onImport: importFullJson,
+      onTextImport: () => setModal({
+        type: 'studentTextImport'
+      }),
       onLocalBackup: () => createLocalBackup(true),
+      onClose: () => setModal(null)
+    }), modal?.type === 'studentTextImport' && _jsx(StudentTextImportModal, {
+      students: students,
+      groups: groups,
+      onImport: applyStudentTextImport,
       onClose: () => setModal(null)
     }), modal?.type === 'deletions' && _jsx(DeleteJournalModal, {
       entries: deletionLog,
@@ -8689,8 +11444,28 @@ function LessonCard({
 }) {
   const done = isFinalLesson(lesson);
   const statusInfo = LESSON_STATUS[lesson.status] || LESSON_STATUS.planned;
+  const openCard = () => {
+    if (lesson.status === 'completed') {
+      onAttend();
+      return;
+    }
+    if (lesson.status === 'planned') {
+      onEdit();
+      return;
+    }
+    onStatus();
+  };
+  const handleCardKey = e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    openCard();
+  };
   return _jsxs("div", {
-    className: "lesson-card",
+    className: `lesson-card status-${lesson.status} ${done ? 'is-final' : ''} ${compact ? 'compact' : ''}`,
+    role: "button",
+    tabIndex: 0,
+    onClick: openCard,
+    onKeyDown: handleCardKey,
     style: {
       opacity: done ? .75 : 1
     },
@@ -8734,14 +11509,6 @@ function LessonCard({
         children: [_jsx("span", {
           className: "lesson-tag",
           style: {
-            background: lesson.type === 'group' ? 'var(--blue)' : 'var(--yellow)',
-            color: lesson.type === 'group' ? '#fff' : 'var(--black)'
-          },
-          children: lesson.type === 'group' ? 'Группа' : 'Инд.'
-        }), _jsx("span", {
-          className: "lesson-tag",
-          style: {
-            marginLeft: 5,
             background: subjectColor(lesson.subject || 'История'),
             color: subjectTagText(lesson.subject || 'История')
           },
@@ -8762,7 +11529,7 @@ function LessonCard({
             color: 'var(--black)'
           },
           children: "\u0414\u0417"
-        }), lesson.status !== 'planned' && _jsx("span", {
+        }), lesson.status !== 'planned' && !done && _jsx("span", {
           className: "lesson-tag",
           style: {
             marginLeft: 5,
@@ -8774,6 +11541,9 @@ function LessonCard({
     }), _jsxs("div", {
       className: "lesson-actions",
       children: [lesson.status === 'planned' ? _jsx("button", {
+        type: "button",
+        title: "Провести",
+        "aria-label": "Провести урок",
         className: "btn btn-sm btn-green",
         onClick: e => {
           e.stopPropagation();
@@ -8783,6 +11553,9 @@ function LessonCard({
           size: 14
         })
       }) : lesson.status === 'completed' ? _jsx("button", {
+        type: "button",
+        title: "Изменить посещение",
+        "aria-label": "Изменить посещение",
         className: "btn btn-sm btn-white",
         onClick: e => {
           e.stopPropagation();
@@ -8792,6 +11565,9 @@ function LessonCard({
           size: 14
         })
       }) : _jsx("button", {
+        type: "button",
+        title: "Статус урока",
+        "aria-label": "Статус урока",
         className: "btn btn-sm btn-white",
         onClick: e => {
           e.stopPropagation();
@@ -8807,6 +11583,9 @@ function LessonCard({
           children: statusInfo.label
         })
       }), _jsx("button", {
+        type: "button",
+        title: "Статус и перенос",
+        "aria-label": "Статус и перенос",
         style: {
           background: 'none',
           border: 'none',
@@ -8822,6 +11601,9 @@ function LessonCard({
           size: 16
         })
       }), _jsx("button", {
+        type: "button",
+        title: "Изменить занятие",
+        "aria-label": "Изменить занятие",
         style: {
           background: 'none',
           border: 'none',
@@ -8837,6 +11619,9 @@ function LessonCard({
           size: 16
         })
       }), _jsx("button", {
+        type: "button",
+        title: "Удалить занятие",
+        "aria-label": "Удалить занятие",
         style: {
           background: 'none',
           border: 'none',
@@ -8844,7 +11629,10 @@ function LessonCard({
           padding: 6,
           color: '#999'
         },
-        onClick: onDelete,
+        onClick: e => {
+          e.stopPropagation();
+          onDelete(e);
+        },
         children: _jsx(IcoTrash, {
           size: 16
         })
@@ -8858,6 +11646,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(_jsx(App, {}));
 // ── PWA: Service Worker Registration ──
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   window.addEventListener('load', () => {
+    const isLocalDev = ['localhost', '127.0.0.1', '::1'].includes(location.hostname);
+    if (isLocalDev) {
+      navigator.serviceWorker.getRegistrations?.().then(regs => regs.forEach(reg => reg.unregister())).catch(() => {});
+      window.caches?.keys?.().then(keys => keys.forEach(key => window.caches.delete(key))).catch(() => {});
+      return;
+    }
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });
 }

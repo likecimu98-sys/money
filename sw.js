@@ -1,10 +1,10 @@
-const CACHE_NAME = 'tutor-app-v47';
+const CACHE_NAME = 'tutor-app-v86';
 const ASSETS = [
   './',
   './index.html',
-  './styles.css?v=19',
+  './styles.css?v=45',
   './financeLogic.js?v=2',
-  './app.js?v=33',
+  './app.js?v=61',
   './vendor/react.production.min.js',
   './vendor/react-dom.production.min.js',
   './manifest.json',
