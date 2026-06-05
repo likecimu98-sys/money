@@ -5961,14 +5961,9 @@ function GroupDetailModal({
   return _jsxs(Modal, {
     title: `${group.emoji ? group.emoji + ' ' : ''}${getGroupDisplayName(group, students)}`,
     onClose: onClose,
+    className: "group-detail-modal",
     children: [_jsxs("div", {
-      style: {
-        marginBottom: 12,
-        display: 'flex',
-        gap: 8,
-        alignItems: 'center',
-        flexWrap: 'wrap'
-      },
+      className: "group-detail-summary",
       children: [_jsx("span", {
         className: "lesson-tag",
         style: {
@@ -5977,88 +5972,52 @@ function GroupDetailModal({
         },
         children: group.subject || 'История'
       }), _jsxs("span", {
-        style: {
-          fontSize: 11,
-          color: '#666'
-        },
+        className: "group-detail-meta",
         children: [completedCount, " \u043F\u0440\u043E\u0432\u0435\u0434\u0435\u043D\u043E \xB7 ", upcoming.length, " \u0437\u0430\u043F\u043B\u0430\u043D\u0438\u0440\u043E\u0432\u0430\u043D\u043E"]
       }), group.archived && _jsx("span", {
         className: "badge badge-yellow",
         children: "\u0410\u0420\u0425\u0418\u0412"
       })]
     }), _jsxs("div", {
-      style: {
-        fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
-        fontSize: 11,
-        fontWeight: 900,
-        marginBottom: 8
-      },
+      className: "group-detail-section-title",
       children: ["\u0423\u0427\u0415\u041D\u0418\u041A\u0418 (", members.length, ")"]
-    }), members.map(s => _jsxs("div", {
-      style: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '8px 0',
-        borderBottom: '1px solid #ddd',
-        fontSize: 12
-      },
-      children: [_jsx("span", {
-        style: {
-          fontWeight: 700
-        },
-        children: s.name
-      }), _jsxs("span", {
-        style: {
-          color: '#666',
-          fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
-          fontSize: 10
-        },
-        children: [group.rateOverrides?.[s.id] !== undefined ? _jsxs(_Fragment, {
-          children: [_jsx("s", {
-            style: {
-              opacity: .5
-            },
-            children: money(s.rate)
-          }), " ", money(group.rateOverrides[s.id])]
-        }) : money(s.rate), "/\u0443\u0440\u043E\u043A"]
-      })]
-    }, s.id)), _jsx("div", {
-      style: {
-        fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
-        fontSize: 11,
-        fontWeight: 900,
-        margin: '14px 0 8px'
-      },
+    }), _jsx("div", {
+      className: "group-detail-list",
+      children: members.map(s => _jsxs("div", {
+        className: "group-detail-row",
+        children: [_jsx("span", {
+          children: s.name
+        }), _jsxs("span", {
+          className: "group-detail-rate",
+          children: [group.rateOverrides?.[s.id] !== undefined ? _jsxs(_Fragment, {
+            children: [_jsx("s", {
+              style: {
+                opacity: .5
+              },
+              children: money(s.rate)
+            }), " ", money(group.rateOverrides[s.id])]
+          }) : money(s.rate), "/\u0443\u0440\u043E\u043A"]
+        })]
+      }, s.id))
+    }), _jsx("div", {
+      className: "group-detail-section-title",
       children: "\u0411\u041B\u0418\u0416\u0410\u0419\u0428\u0418\u0415 \u0423\u0420\u041E\u041A\u0418"
     }), upcoming.length === 0 ? _jsx("div", {
-      style: {
-        fontSize: 11,
-        color: '#888'
-      },
+      className: "group-detail-empty",
       children: "\u041D\u0435\u0442 \u0437\u0430\u043F\u043B\u0430\u043D\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0445 \u0443\u0440\u043E\u043A\u043E\u0432"
-    }) : upcoming.map(l => _jsxs("div", {
-      style: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        padding: '8px 0',
-        borderBottom: '1px solid #ddd',
-        fontSize: 11
-      },
-      children: [_jsx("span", {
-        children: fmtDate(l.date)
-      }), _jsx("span", {
-        style: {
-          fontWeight: 700
-        },
-        children: l.time
-      })]
-    }, l.id)), _jsxs("div", {
-      style: {
-        display: 'flex',
-        gap: 10,
-        marginTop: 16
-      },
+    }) : _jsx("div", {
+      className: "group-detail-list compact",
+      children: upcoming.map(l => _jsxs("div", {
+        className: "group-detail-row",
+        children: [_jsx("span", {
+          children: fmtDate(l.date)
+        }), _jsx("span", {
+          className: "group-detail-rate",
+          children: l.time
+        })]
+      }, l.id))
+    }), _jsxs("div", {
+      className: "modal-actions group-detail-actions",
       children: [_jsx("button", {
         className: "btn btn-white btn-full",
         onClick: onClose,
@@ -9349,6 +9308,48 @@ function App() {
       const d = new Date(ds + 'T00:00:00');
       return d >= bounds.start && d <= bounds.end;
     };
+    const periodOptions = [['last_month', 'Прошлый мес.'], ['current_month', 'Этот месяц'], ['next_month', 'Следующий'], ['all_time', 'Всё время']];
+    const FinancePeriodPicker = () => _jsxs("div", {
+      className: "finance-period-panel",
+      children: [_jsx("div", {
+        className: "finance-period-label",
+        children: "\u041F\u0435\u0440\u0438\u043E\u0434 \u0440\u0430\u0441\u0447\u0435\u0442\u0430"
+      }), _jsxs("div", {
+        className: "finance-period-grid",
+        children: [periodOptions.map(([v, l]) => _jsx("button", {
+          type: "button",
+          className: `finance-period-btn ${analyticsPeriod === v ? 'active' : ''}`,
+          onClick: () => setAnalyticsPeriod(v),
+          children: l
+        }, v)), _jsx("button", {
+          type: "button",
+          className: `finance-period-btn custom ${analyticsPeriod === 'custom' ? 'active' : ''}`,
+          onClick: () => setAnalyticsPeriod('custom'),
+          children: "\u0421\u0432\u043E\u0439 \u043F\u0435\u0440\u0438\u043E\u0434"
+        })]
+      }), analyticsPeriod === 'custom' && _jsxs("div", {
+        className: "finance-period-custom",
+        children: [_jsxs("label", {
+          children: [_jsx("span", {
+            children: "\u0421"
+          }), _jsx("input", {
+            className: "input",
+            type: "date",
+            value: customFrom,
+            onChange: e => setCustomFrom(e.target.value)
+          })]
+        }), _jsxs("label", {
+          children: [_jsx("span", {
+            children: "\u041F\u043E"
+          }), _jsx("input", {
+            className: "input",
+            type: "date",
+            value: customTo,
+            onChange: e => setCustomTo(e.target.value)
+          })]
+        })]
+      })]
+    });
 
     // All completed lessons
     const completedLessons = lessons.filter(l => l.status === 'completed' || l.status === 'no_show');
@@ -10205,92 +10206,7 @@ function App() {
       })]
     });
     const AnalyticsTab = () => _jsxs("div", {
-      children: [_jsxs("div", {
-        style: {
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 6,
-          marginBottom: 6
-        },
-        children: [[['last_month', 'Прошлый мес.'], ['current_month', 'Этот месяц'], ['next_month', 'Следующий'], ['all_time', 'Всё время']].map(([v, l]) => _jsx("button", {
-          onClick: () => setAnalyticsPeriod(v),
-          style: {
-            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
-            fontSize: 9,
-            fontWeight: 700,
-            padding: '8px 6px',
-            border: 'var(--border)',
-            borderRadius: 4,
-            cursor: 'pointer',
-            background: analyticsPeriod === v ? 'var(--ink)' : 'var(--white)',
-            color: analyticsPeriod === v ? 'var(--yellow)' : 'var(--black)',
-            boxShadow: analyticsPeriod === v ? 'none' : 'var(--shadow)'
-          },
-          children: l
-        }, v)), _jsx("button", {
-          onClick: () => setAnalyticsPeriod('custom'),
-          style: {
-            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
-            fontSize: 9,
-            fontWeight: 700,
-            padding: '8px 6px',
-            border: 'var(--border)',
-            borderRadius: 4,
-            cursor: 'pointer',
-            gridColumn: '1/-1',
-            background: analyticsPeriod === 'custom' ? 'var(--blue)' : 'var(--white)',
-            color: analyticsPeriod === 'custom' ? '#fff' : 'var(--black)',
-            boxShadow: analyticsPeriod === 'custom' ? 'none' : 'var(--shadow)'
-          },
-          children: "\u0421\u0432\u043E\u0439 \u043F\u0435\u0440\u0438\u043E\u0434"
-        })]
-      }), analyticsPeriod === 'custom' && _jsxs("div", {
-        style: {
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 8,
-          marginBottom: 12,
-          padding: '10px',
-          border: 'var(--border)',
-          borderRadius: 4,
-          background: 'var(--bg-subtle)'
-        },
-        children: [_jsxs("div", {
-          children: [_jsx("label", {
-            className: "label",
-            style: {
-              fontSize: 9
-            },
-            children: "\u0421"
-          }), _jsx("input", {
-            className: "input",
-            type: "date",
-            value: customFrom,
-            onChange: e => setCustomFrom(e.target.value),
-            style: {
-              padding: '6px 8px',
-              fontSize: 12
-            }
-          })]
-        }), _jsxs("div", {
-          children: [_jsx("label", {
-            className: "label",
-            style: {
-              fontSize: 9
-            },
-            children: "\u041F\u043E"
-          }), _jsx("input", {
-            className: "input",
-            type: "date",
-            value: customTo,
-            onChange: e => setCustomTo(e.target.value),
-            style: {
-              padding: '6px 8px',
-              fontSize: 12
-            }
-          })]
-        })]
-      }), _jsx("div", {
+      children: [_jsx("div", {
         className: "finance-section-title",
         children: "ДЕНЕЖНЫЕ ИНСАЙТЫ"
       }), _jsx("div", {
@@ -11023,7 +10939,7 @@ function App() {
             children: ["\u0416\u0443\u0440\u043D\u0430\u043B ", deletionLog.length ? `· ${deletionLog.length}` : '']
           })]
         })]
-      }), _jsxs("div", {
+      }), _jsx(FinancePeriodPicker, {}), _jsxs("div", {
         className: "toggle-row",
         style: {
           marginBottom: 16

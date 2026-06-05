@@ -773,6 +773,74 @@ body[data-theme="dark"] .badge-yellow {
 .finance-page{max-width:1180px;margin:0 auto}
 .finance-section-title{font-family:var(--font-display);font-size:11px;font-weight:900;line-height:1.2;margin:16px 0 10px;text-transform:uppercase;color:var(--black)}
 .finance-section-title.compact{font-size:10px;margin:0 0 10px}
+.finance-period-panel{
+  border:var(--border);
+  border-radius:10px;
+  background:var(--surface);
+  box-shadow:var(--shadow-soft);
+  padding:10px;
+  margin:0 0 14px;
+  display:grid;
+  gap:8px;
+}
+.finance-period-label{
+  font-family:var(--font-display);
+  font-size:10px;
+  font-weight:900;
+  line-height:1.2;
+  text-transform:uppercase;
+  color:var(--text-sec);
+}
+.finance-period-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:7px;
+}
+.finance-period-btn{
+  min-height:40px;
+  border:1.5px solid var(--border-light);
+  border-radius:8px;
+  background:var(--surface);
+  color:var(--black);
+  font-family:var(--font-display);
+  font-size:10px;
+  font-weight:900;
+  line-height:1.15;
+  cursor:pointer;
+  box-shadow:none;
+}
+.finance-period-btn.active{
+  background:var(--ink);
+  color:var(--yellow);
+  border-color:var(--ink);
+}
+.finance-period-btn.custom.active{
+  background:var(--yellow);
+  color:var(--black);
+  border-color:var(--yellow-dark);
+}
+.finance-period-custom{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  padding-top:2px;
+}
+.finance-period-custom label{
+  display:grid;
+  gap:5px;
+}
+.finance-period-custom span{
+  font-family:var(--font-display);
+  font-size:9px;
+  font-weight:900;
+  color:var(--text-sec);
+  text-transform:uppercase;
+}
+.finance-period-custom .input{
+  min-height:38px;
+  padding:7px 9px;
+  font-size:12px;
+}
 .finance-insight-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
 .finance-insight-card{min-width:0;border:var(--border);border-radius:8px;background:var(--surface);box-shadow:var(--shadow);padding:12px;display:grid;gap:6px;align-content:start}
 .finance-insight-card.hot{background:color-mix(in srgb, var(--red) 16%, var(--surface));border-color:color-mix(in srgb, var(--red) 48%, var(--border-light))}
@@ -5305,6 +5373,602 @@ body[data-theme="dark"] .today-upcoming {
   .parent-kpi-grid,
   .parent-chart-grid {
     gap: 10px;
+  }
+}
+
+/* WIDE DESKTOP REPAIR: use large screens as a workspace, not a narrow column */
+@media(min-width:1500px) {
+  .main {
+    width: calc(100vw - 96px);
+    max-width: none;
+    margin-left: 96px;
+    margin-right: 0;
+    padding: 34px clamp(42px, 4vw, 76px) 46px;
+  }
+  .today-page,
+  .students-page,
+  .finance-page {
+    width: min(100%, 1480px);
+    max-width: 1480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .schedule-page {
+    width: min(100%, 1660px);
+    max-width: 1660px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .today-page {
+    grid-template-columns: minmax(760px, 1fr) minmax(360px, 430px);
+    gap: 22px;
+  }
+  .today-command-panel {
+    max-width: none;
+  }
+  .today-page > .lesson-card {
+    min-height: 118px;
+  }
+  .today-upcoming .lesson-card.compact {
+    min-height: 92px;
+  }
+  .sched-swipe {
+    display: grid;
+    grid-template-columns: minmax(980px, 1fr) minmax(320px, 360px);
+    gap: 16px;
+    align-items: start;
+  }
+  .sched-swipe > .week-nav {
+    grid-column: 1 / -1;
+  }
+  .sched-swipe > .sched-desktop {
+    grid-column: 1;
+    min-width: 0;
+  }
+  .sched-swipe > .desktop-selected-day-panel {
+    grid-column: 2;
+    grid-row: 2;
+    display: block;
+    position: sticky;
+    top: 22px;
+    max-width: none;
+    margin: 0;
+  }
+  .schedule-grid-wrap {
+    padding: 12px;
+    overflow: visible;
+  }
+  .schedule-table {
+    min-width: 960px;
+    border-spacing: 7px;
+  }
+  .schedule-head-cell {
+    height: 72px;
+  }
+  .schedule-lesson-cell {
+    min-height: 104px;
+    height: 104px;
+  }
+  .desktop-selected-day-head {
+    padding: 13px 14px;
+  }
+  .desktop-selected-day-head strong {
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .desktop-selected-day-list {
+    gap: 8px;
+    padding: 10px;
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+  }
+  .desktop-selected-day-list .lesson-card {
+    max-width: none;
+    min-height: 78px;
+    box-shadow: none;
+  }
+  .desktop-selected-day-list .lesson-time {
+    min-width: 58px;
+    font-size: 14px;
+  }
+  .desktop-selected-day-list .lesson-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding: 10px 8px 10px 12px;
+  }
+  .desktop-selected-day-list .lesson-name {
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  .desktop-selected-day-list .lesson-actions {
+    grid-column: 1;
+    grid-row: auto;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 0;
+  }
+  .desktop-selected-day-list .lesson-actions button {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media(min-width:769px) {
+  .group-detail-modal {
+    width: min(92vw, 720px);
+    max-width: 720px;
+  }
+}
+
+.group-detail-modal .modal-title {
+  font-size: clamp(20px, 2.3vw, 26px);
+  line-height: 1.12;
+}
+.group-detail-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 14px;
+}
+.group-detail-meta {
+  color: var(--text-sec);
+  font-size: 12px;
+  font-weight: 800;
+}
+.group-detail-section-title {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.group-detail-list {
+  border: 1.5px solid var(--border-light);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 94%, var(--white));
+  overflow: hidden;
+}
+.group-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border-light);
+  font-size: 14px;
+  line-height: 1.35;
+}
+.group-detail-row:first-child {
+  border-top: 0;
+}
+.group-detail-rate {
+  color: var(--text-sec);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.group-detail-list.compact .group-detail-row {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.group-detail-empty {
+  border: 1.5px dashed var(--border-light);
+  border-radius: 10px;
+  padding: 14px;
+  color: var(--text-sec);
+  font-size: 13px;
+  font-weight: 800;
+}
+.group-detail-actions {
+  margin-top: 14px;
+}
+
+@media(max-width:768px) {
+  .group-detail-summary {
+    padding-top: 10px;
+  }
+  .group-detail-row {
+    padding: 10px 11px;
+    font-size: 13px;
+  }
+  .group-detail-rate {
+    font-size: 10px;
+  }
+  .group-detail-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* DESKTOP SELECTED DAY: fixed columns, no floating time blocks */
+@media(min-width:769px) {
+  .desktop-selected-day-list {
+    align-items: stretch;
+    justify-items: stretch;
+  }
+  .desktop-selected-day-list .lesson-card {
+    width: 100%;
+    max-width: none;
+    min-height: 84px;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr) max-content;
+    align-items: stretch;
+  }
+  .desktop-selected-day-list .lesson-time {
+    width: 76px;
+    min-width: 76px;
+    padding: 0 8px;
+  }
+  .desktop-selected-day-list .lesson-body {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    gap: 6px;
+    padding: 12px 14px;
+  }
+  .desktop-selected-day-list .lesson-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .desktop-selected-day-list .lesson-actions {
+    grid-column: auto;
+    grid-row: auto;
+    align-self: center;
+    justify-self: end;
+    min-width: 152px;
+    justify-content: flex-end;
+    padding: 0 14px 0 0;
+    gap: 10px;
+  }
+  .desktop-selected-day-list .lesson-actions button {
+    flex: 0 0 auto;
+  }
+}
+
+@media(min-width:1500px) {
+  .desktop-selected-day-list .lesson-card {
+    grid-template-columns: 68px minmax(0, 1fr) max-content;
+    min-height: 82px;
+  }
+  .desktop-selected-day-list .lesson-time {
+    width: 68px;
+    min-width: 68px;
+  }
+  .desktop-selected-day-list .lesson-actions {
+    min-width: 124px;
+    gap: 7px;
+    padding-right: 10px;
+  }
+}
+
+/* FINAL SELECTED DAY ROW FIX: compact aligned rows */
+@media(min-width:769px) {
+  .desktop-selected-day-list .lesson-card {
+    height: 82px;
+    min-height: 82px;
+    max-height: 82px;
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+  .desktop-selected-day-list .lesson-time {
+    height: 100%;
+    width: 76px;
+    min-width: 76px;
+  }
+  .desktop-selected-day-list .lesson-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 168px;
+    grid-template-rows: auto auto;
+    align-content: center;
+    gap: 5px 12px;
+    padding: 10px 14px;
+  }
+  .desktop-selected-day-list .lesson-name {
+    grid-column: 1;
+    grid-row: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+    overflow: hidden;
+  }
+  .desktop-selected-day-list .lesson-body > div:nth-child(2) {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+  }
+  .desktop-selected-day-list .lesson-actions {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    justify-self: end;
+    min-width: 0;
+    width: 168px;
+    justify-content: flex-end;
+    padding: 0;
+  }
+}
+
+@media(min-width:1500px) {
+  .desktop-selected-day-list .lesson-card {
+    height: 78px;
+    min-height: 78px;
+    max-height: 78px;
+    grid-template-columns: 68px minmax(0, 1fr);
+  }
+  .desktop-selected-day-list .lesson-time {
+    width: 68px;
+    min-width: 68px;
+  }
+  .desktop-selected-day-list .lesson-body {
+    grid-template-columns: minmax(0, 1fr) 124px;
+    padding: 9px 10px 9px 12px;
+  }
+  .desktop-selected-day-list .lesson-actions {
+    width: 124px;
+  }
+}
+
+/* STUDENTS MONEY BADGES: debt/prepay must read as money, not as tiny tags */
+.students-page .student-item .badge {
+  min-width: 62px;
+  min-height: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  box-shadow: 2px 2px 0 var(--shadow-color);
+}
+.students-page .student-item button.badge {
+  color: inherit;
+}
+.students-page .student-item .badge-red {
+  background: var(--red);
+  color: var(--on-red);
+}
+.students-page .student-item .badge-green {
+  background: var(--green);
+  color: var(--on-green);
+}
+.students-page .student-item .badge-yellow {
+  background: var(--yellow);
+  color: var(--on-yellow);
+}
+.students-page .student-item .debt-message-trigger {
+  color: var(--on-red);
+}
+
+@media(max-width:768px) {
+  .students-page .student-item .badge {
+    min-width: 70px;
+    min-height: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+}
+
+@media(max-width:520px) {
+  .finance-period-panel {
+    padding: 9px;
+    border-radius: 12px;
+  }
+  .finance-period-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .finance-period-btn {
+    min-height: 38px;
+    font-size: 9px;
+  }
+  .finance-period-btn.custom {
+    grid-column: 1 / -1;
+  }
+  .finance-period-custom {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* FINAL VISUAL POLISH: compact laptop/tablet layout without horizontal schedule scroll */
+@media(min-width:900px) and (max-width:1199px) {
+  .main {
+    width: min(920px, calc(100vw - 128px));
+    max-width: 920px;
+    margin-left: calc(96px + max(24px, (100vw - 96px - 920px) / 2));
+    margin-right: max(24px, (100vw - 96px - 920px) / 2);
+    padding: 30px 0 44px;
+  }
+
+  .today-page,
+  .schedule-page,
+  .students-page,
+  .finance-page {
+    width: 100%;
+    max-width: none;
+  }
+
+  .schedule-toolbar,
+  .week-nav,
+  .schedule-page .filter-row {
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .schedule-toolbar {
+    gap: 14px;
+  }
+
+  .sched-desktop,
+  .desktop-selected-day-panel {
+    display: none;
+  }
+
+  .sched-mobile {
+    display: block;
+  }
+
+  .mobile-week-shell {
+    max-width: 920px;
+    margin: 0 auto;
+    gap: 13px;
+  }
+
+  .mobile-week-strip {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+    padding: 0;
+    background: transparent;
+  }
+
+  .mobile-week-strip-day {
+    height: 82px;
+    border-radius: 12px;
+    padding: 8px 4px 6px;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .mobile-week-strip-day span {
+    font-size: 10px;
+  }
+
+  .mobile-week-strip-day strong {
+    font-size: 25px;
+    line-height: .9;
+  }
+
+  .mobile-week-strip-day em {
+    min-width: 28px;
+    height: 22px;
+    font-size: 10px;
+  }
+
+  .mobile-week-strip-day small {
+    font-size: 9px;
+  }
+
+  .mobile-selected-day {
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .mobile-selected-head {
+    padding: 15px 18px;
+  }
+
+  .mobile-selected-head strong {
+    font-size: 21px;
+    line-height: 1.1;
+  }
+
+  .mobile-selected-summary button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .mobile-agenda-list {
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .mobile-agenda-card {
+    min-height: 84px;
+    grid-template-columns: 78px minmax(0, 1fr) max-content;
+    align-items: center;
+    gap: 13px;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .mobile-agenda-time {
+    width: 78px;
+    height: 58px;
+    font-size: 17px;
+  }
+
+  .mobile-agenda-title {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+
+  .mobile-agenda-title span {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .mobile-agenda-meta {
+    gap: 5px;
+  }
+
+  .mobile-agenda-meta span {
+    padding: 2px 7px;
+    font-size: 10px;
+  }
+
+  .mobile-agenda-actions {
+    grid-column: 3;
+    grid-row: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 38px);
+    justify-content: end;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0;
+  }
+
+  .mobile-agenda-main,
+  .mobile-agenda-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .finance-insight-grid,
+  .crm-dashboard,
+  .today-command-grid,
+  .today-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .finance-forecast-lab,
+  .finance-stability-grid,
+  .finance-split-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media(max-width:768px) {
+  .modal {
+    box-shadow: 0 -14px 36px rgba(17, 22, 27, .18);
+  }
+
+  .modal .detail-tabs {
+    gap: 5px;
+    padding: 4px;
+  }
+
+  .modal .toggle-opt,
+  .modal .detail-tabs button {
+    min-height: 38px;
+    font-size: 9px;
+    line-height: 1.15;
+  }
+
+  .lesson-card .lesson-name,
+  .mobile-agenda-title {
+    letter-spacing: 0;
   }
 }
 
