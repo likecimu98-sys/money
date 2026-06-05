@@ -1592,7 +1592,7 @@ function UndoToast({
         border: 'none',
         borderRadius: 3,
         padding: '6px 12px',
-        fontFamily: 'Unbounded,cursive',
+        fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
         fontSize: 10,
         fontWeight: 700,
         cursor: 'pointer',
@@ -1746,7 +1746,7 @@ function SearchModal({
         children: [rStudents.length > 0 && _jsxs(_Fragment, {
           children: [_jsx("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 9,
               fontWeight: 900,
               padding: '6px 0',
@@ -1781,7 +1781,7 @@ function SearchModal({
         }), rGroups.length > 0 && _jsxs(_Fragment, {
           children: [_jsx("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 9,
               fontWeight: 900,
               padding: '6px 0',
@@ -1808,7 +1808,7 @@ function SearchModal({
         }), rLessons.length > 0 && _jsxs(_Fragment, {
           children: [_jsx("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 9,
               fontWeight: 900,
               padding: '6px 0',
@@ -1877,7 +1877,7 @@ function TimerBanner({
       },
       children: [_jsxs("div", {
         style: {
-          fontFamily: 'Unbounded,cursive',
+          fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
           fontSize: 11,
           fontWeight: 900
         },
@@ -2118,7 +2118,7 @@ function StudentModal({
             style: {
               fontSize: 11,
               minWidth: 88,
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontWeight: 700
             },
             children: subject
@@ -3135,7 +3135,7 @@ function LessonModal({
               flex: 1,
               padding: '7px 2px',
               fontSize: 10,
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontWeight: 700
             },
             children: d < 60 ? `${d}м` : d === 60 ? '1ч' : d === 90 ? '1.5ч' : '2ч'
@@ -3202,7 +3202,7 @@ function LessonModal({
               border: 'var(--border)',
               borderRadius: 7,
               cursor: 'pointer',
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 10,
               fontWeight: 700,
               background: days.includes(i) ? 'var(--ink)' : 'var(--surface)',
@@ -3230,7 +3230,7 @@ function LessonModal({
           }), _jsx("span", {
             style: {
               fontSize: 11,
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontWeight: 700
             },
             children: "\u041F\u043E\u0432\u0442\u043E\u0440\u044F\u0442\u044C \u0435\u0436\u0435\u043D\u0435\u0434\u0435\u043B\u044C\u043D\u043E"
@@ -4783,7 +4783,7 @@ function StudentDetailModal({
           },
           children: [_jsxs("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 11,
               fontWeight: 900,
               marginBottom: 8,
@@ -4905,7 +4905,7 @@ function StudentDetailModal({
           children: "\u0411\u043B\u0438\u0436\u0430\u0439\u0448\u0435\u0435 \u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435"
         }), _jsxs("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 13,
             fontWeight: 900
           },
@@ -5071,7 +5071,7 @@ function StudentDetailModal({
           },
           children: [_jsx("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 12,
               fontWeight: 900,
               marginBottom: 6
@@ -5746,7 +5746,7 @@ function MessageModal({
       }) : _jsxs(_Fragment, {
         children: [_jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 10,
             fontWeight: 900,
             marginBottom: 8,
@@ -5774,7 +5774,7 @@ function MessageModal({
           })]
         }, t.id)), _jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 10,
             fontWeight: 900,
             margin: '14px 0 8px',
@@ -5987,7 +5987,7 @@ function GroupDetailModal({
       })]
     }), _jsxs("div", {
       style: {
-        fontFamily: 'Unbounded,cursive',
+        fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
         fontSize: 11,
         fontWeight: 900,
         marginBottom: 8
@@ -6010,7 +6010,7 @@ function GroupDetailModal({
       }), _jsxs("span", {
         style: {
           color: '#666',
-          fontFamily: 'Unbounded,cursive',
+          fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
           fontSize: 10
         },
         children: [group.rateOverrides?.[s.id] !== undefined ? _jsxs(_Fragment, {
@@ -6024,7 +6024,7 @@ function GroupDetailModal({
       })]
     }, s.id)), _jsx("div", {
       style: {
-        fontFamily: 'Unbounded,cursive',
+        fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
         fontSize: 11,
         fontWeight: 900,
         margin: '14px 0 8px'
@@ -6292,7 +6292,7 @@ function TipsModal({
         })
       }), _jsx("div", {
         style: {
-          fontFamily: 'Unbounded,cursive',
+          fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
           fontWeight: 900,
           fontSize: 14,
           marginBottom: 12,
@@ -7669,7 +7669,7 @@ function App() {
         children: [_jsxs("div", {
           children: [_jsx("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 11,
               color: 'var(--text-sec)',
               textTransform: 'uppercase',
@@ -7680,7 +7680,7 @@ function App() {
             })
           }), _jsx("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 28,
               fontWeight: 900,
               lineHeight: 1.1
@@ -7712,7 +7712,7 @@ function App() {
             },
             children: [_jsx("div", {
               style: {
-                fontFamily: 'Unbounded,cursive',
+                fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                 fontSize: 9,
                 color: 'var(--red)',
                 textTransform: 'uppercase'
@@ -7720,7 +7720,7 @@ function App() {
               children: "\u0414\u043E\u043B\u0433\u0438"
             }), _jsxs("div", {
               style: {
-                fontFamily: 'Unbounded,cursive',
+                fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                 fontSize: 16,
                 fontWeight: 900,
                 color: 'var(--black)'
@@ -7841,7 +7841,7 @@ function App() {
         },
         children: [_jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 12,
             fontWeight: 900,
             marginBottom: 8
@@ -7919,7 +7919,7 @@ function App() {
         },
         children: [_jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 13,
             fontWeight: 900
           },
@@ -7944,7 +7944,7 @@ function App() {
         },
         children: _jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 13,
             color: 'var(--text-muted)',
             lineHeight: 1.5
@@ -7989,7 +7989,7 @@ function App() {
           },
           children: [_jsx("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 13,
               fontWeight: 900,
               marginBottom: 10
@@ -8005,7 +8005,7 @@ function App() {
             },
             children: [_jsx("div", {
               style: {
-                fontFamily: 'Unbounded,cursive',
+                fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                 fontSize: 10,
                 color: 'var(--text-sec)',
                 marginBottom: 6,
@@ -8987,7 +8987,7 @@ function App() {
             },
             children: [_jsx("div", {
               style: {
-                fontFamily: 'Unbounded,cursive',
+                fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                 fontWeight: 900,
                 fontSize: 13,
                 marginBottom: 4
@@ -9162,7 +9162,7 @@ function App() {
               },
               children: [_jsxs("div", {
                 style: {
-                  fontFamily: 'Unbounded,cursive',
+                  fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                   fontWeight: 900,
                   fontSize: 13,
                   marginBottom: 4
@@ -9786,7 +9786,7 @@ function App() {
       }), debtors.length > 0 && _jsxs(_Fragment, {
         children: [_jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 12,
             fontWeight: 900,
             marginBottom: 10
@@ -9808,7 +9808,7 @@ function App() {
             },
             children: [_jsx("div", {
               style: {
-                fontFamily: 'Unbounded,cursive',
+                fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                 fontWeight: 900,
                 fontSize: 12
               },
@@ -9852,7 +9852,7 @@ function App() {
       }), lowPackages.length > 0 && _jsxs(_Fragment, {
         children: [_jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 12,
             fontWeight: 900,
             marginBottom: 10
@@ -9874,7 +9874,7 @@ function App() {
             },
             children: [_jsx("div", {
               style: {
-                fontFamily: 'Unbounded,cursive',
+                fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                 fontWeight: 900,
                 fontSize: 12
               },
@@ -9906,7 +9906,7 @@ function App() {
         },
         children: [_jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 12,
             fontWeight: 900
           },
@@ -9962,7 +9962,9 @@ function App() {
             children: "\u0421\u043F\u0438\u0441\u0430\u043D\u0438\u044F"
           })]
         })]
-      }), historyTxs.slice(0, 50).map(tx => {
+      }), _jsx("div", {
+        className: "finance-history-list",
+        children: historyTxs.slice(0, 12).map(tx => {
         const s = students.find(st => sameId(st.id, tx.studentId));
         const meta = getTxMeta(tx);
         return _jsxs("div", {
@@ -9996,7 +9998,7 @@ function App() {
             },
             children: [_jsxs("div", {
               style: {
-                fontFamily: 'Unbounded,cursive',
+                fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                 fontWeight: 900,
                 fontSize: 14,
                 color: tx.type === 'payment' ? 'var(--green)' : 'var(--red)',
@@ -10039,6 +10041,10 @@ function App() {
             })]
           })]
         }, tx.id);
+      })
+      }), historyTxs.length > 12 && _jsxs("div", {
+        className: "finance-history-more metric-sub",
+        children: ["\u0415\u0449\u0435 ", historyTxs.length - 12, " \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0439"]
       }), _jsxs("div", {
         style: {
           display: 'grid',
@@ -10063,7 +10069,7 @@ function App() {
         },
         children: [_jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 10,
             fontWeight: 900,
             marginBottom: 4
@@ -10192,7 +10198,7 @@ function App() {
         children: [[['last_month', 'Прошлый мес.'], ['current_month', 'Этот месяц'], ['next_month', 'Следующий'], ['all_time', 'Всё время']].map(([v, l]) => _jsx("button", {
           onClick: () => setAnalyticsPeriod(v),
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 9,
             fontWeight: 700,
             padding: '8px 6px',
@@ -10207,7 +10213,7 @@ function App() {
         }, v)), _jsx("button", {
           onClick: () => setAnalyticsPeriod('custom'),
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 9,
             fontWeight: 700,
             padding: '8px 6px',
@@ -10544,7 +10550,7 @@ function App() {
         })]
       }), _jsxs("div", {
         style: {
-          fontFamily: 'Unbounded,cursive',
+          fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
           fontSize: 11,
           fontWeight: 900,
           marginBottom: 10,
@@ -10645,7 +10651,7 @@ function App() {
         className: "finance-panel",
         children: [_jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 10,
             fontWeight: 900,
             marginBottom: 6
@@ -10673,7 +10679,7 @@ function App() {
             })]
           }), _jsxs("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 28,
               fontWeight: 900,
               color: avgSkipRate > 0.2 ? 'var(--red)' : avgSkipRate > 0.1 ? '#b9892f' : 'var(--green)'
@@ -10699,7 +10705,7 @@ function App() {
         })]
       }), _jsx("div", {
         style: {
-          fontFamily: 'Unbounded,cursive',
+          fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
           fontSize: 11,
           fontWeight: 900,
           marginBottom: 10
@@ -10733,7 +10739,7 @@ function App() {
           className: "finance-panel finance-chart-panel",
           children: [_jsx("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 10,
               fontWeight: 900,
               marginBottom: 10
@@ -10771,7 +10777,7 @@ function App() {
                     y: h - barH - 4,
                     textAnchor: "middle",
                     fontSize: "8",
-                    fontFamily: "Unbounded,cursive",
+                    fontFamily: "Unbounded, Arial Black, Segoe UI, sans-serif",
                     fontWeight: "700",
                     fill: "var(--black)",
                     children: [Math.round(val / 1000), "\u043A"]
@@ -10818,7 +10824,7 @@ function App() {
           className: "finance-panel finance-subject-panel",
           children: [_jsx("div", {
             style: {
-              fontFamily: 'Unbounded,cursive',
+              fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
               fontSize: 10,
               fontWeight: 900,
               marginBottom: 10
@@ -10855,7 +10861,7 @@ function App() {
         });
       })(), _jsx("div", {
         style: {
-          fontFamily: 'Unbounded,cursive',
+          fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
           fontSize: 11,
           fontWeight: 900,
           marginBottom: 10
@@ -10866,7 +10872,7 @@ function App() {
           textAlign: 'center',
           padding: 20,
           color: 'var(--text-muted)',
-          fontFamily: 'Unbounded,cursive',
+          fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
           fontSize: 11
         },
         children: "\u041D\u0435\u0442 \u0434\u0430\u043D\u043D\u044B\u0445 \u0437\u0430 \u043F\u0435\u0440\u0438\u043E\u0434"
@@ -10888,7 +10894,7 @@ function App() {
             },
             children: [_jsx("div", {
               style: {
-                fontFamily: 'Unbounded,cursive',
+                fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                 fontWeight: 900,
                 fontSize: 12
               },
@@ -10900,7 +10906,7 @@ function App() {
               },
               children: [_jsxs("span", {
                 style: {
-                  fontFamily: 'Unbounded,cursive',
+                  fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                   fontSize: 11,
                   fontWeight: 900,
                   color: 'var(--green)'
@@ -10908,7 +10914,7 @@ function App() {
                 children: [s.earned.toLocaleString(), " \u20BD"]
               }), s.lost > 0 && _jsxs("span", {
                 style: {
-                  fontFamily: 'Unbounded,cursive',
+                  fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
                   fontSize: 11,
                   fontWeight: 900,
                   color: 'var(--red)'
@@ -11034,7 +11040,7 @@ function App() {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100dvh',
-      fontFamily: 'Unbounded,cursive',
+      fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
       fontSize: 14
     },
     children: "\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430..."
@@ -11168,7 +11174,7 @@ function App() {
         },
         children: [_jsx("div", {
           style: {
-            fontFamily: 'Unbounded,cursive',
+            fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
             fontSize: 10,
             fontWeight: 900,
             padding: '8px 8px 4px',
@@ -11655,3 +11661,4 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });
 }
+
