@@ -2952,9 +2952,9 @@ function LessonModal({
     if (!lessonToEdit && days.length === 0 && date) setDays([new Date(date).getDay()]);
   }, [date]);
   useEffect(() => {
-    if (type === 'individual' && activeStudents.length && !targetId) setTgt(String(activeStudents[0].id));
+    if (type === 'individual' && activeStudents.length && (!targetId || !activeStudents.find(s => sameId(s.id, targetId)))) setTgt(String(activeStudents[0].id));
     if (type === 'group' && activeGroups.length && (!targetId || !activeGroups.find(g => sameId(g.id, targetId)))) setTgt(String(activeGroups[0].id));
-  }, [type, groups]);
+  }, [type, targetId, students, groups]);
   useEffect(() => {
     if (lessonToEdit) return;
     if (type === 'group') {
@@ -2983,9 +2983,10 @@ function LessonModal({
   const submit = e => {
     e.preventDefault();
     if (!targetId) return;
+    const selectedTarget = (type === 'individual' ? activeStudents : activeGroups).find(x => sameId(x.id, targetId));
     const base = {
       type,
-      targetId: Number(targetId),
+      targetId: selectedTarget?.id ?? targetId,
       subject,
       time,
       duration: Number(duration),
@@ -7484,7 +7485,13 @@ function App() {
   };
   const exportSchedulePdf = (fromDate, toDate) => {
     const filtered = lessons.filter(l => l.date >= fromDate && l.date <= toDate).sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
-    const getName = l => l.type === 'group' ? getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) : students.find(s => sameId(s.id, l.targetId))?.name || '?';
+    const getName = l => {
+      if (l.type === 'group') return getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) || 'Группа';
+      const student = students.find(s => sameId(s.id, l.targetId));
+      if (student?.name) return student.name;
+      const staleGroup = groups.find(g => sameId(g.id, l.targetId));
+      return getGroupDisplayName(staleGroup, students) || 'Индивидуально';
+    };
     const statusRu = s => LESSON_STATUS[s]?.label || s;
     const cards = filtered.map(l => `
       <section class="lesson-card-print">
@@ -7541,7 +7548,13 @@ function App() {
       theme: p.theme === 'dark' ? 'light' : 'dark'
     }));
   };
-  const getLessonName = l => l.type === 'group' ? getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) : students.find(s => sameId(s.id, l.targetId))?.name || '?';
+  const getLessonName = l => {
+    if (l.type === 'group') return getGroupDisplayName(groups.find(g => sameId(g.id, l.targetId)), students) || 'Группа';
+    const student = students.find(s => sameId(s.id, l.targetId));
+    if (student?.name) return student.name;
+    const staleGroup = groups.find(g => sameId(g.id, l.targetId));
+    return getGroupDisplayName(staleGroup, students) || 'Индивидуально';
+  };
   const openLessonCard = l => {
     if (!l) return;
     if (l.status === 'completed') {
@@ -7660,6 +7673,7 @@ function App() {
           payload: currentLesson
         })
       }), _jsxs("div", {
+        className: "today-hero",
         style: {
           display: 'flex',
           justifyContent: 'space-between',
@@ -7911,6 +7925,7 @@ function App() {
           }, i);
         })]
       }), _jsxs("div", {
+        className: "today-lessons-head",
         style: {
           display: 'flex',
           justifyContent: 'space-between',
@@ -7984,9 +7999,6 @@ function App() {
         if (!upcoming.length) return null;
         return _jsxs("div", {
           className: "today-upcoming",
-          style: {
-            marginTop: 20
-          },
           children: [_jsx("div", {
             style: {
               fontFamily: 'Unbounded, Arial Black, Segoe UI, sans-serif',
@@ -9260,6 +9272,7 @@ function App() {
     const [analyticsPeriod, setAnalyticsPeriod] = useState('current_month');
     const [txStudentFilter, setTxStudentFilter] = useState('all');
     const [txTypeFilter, setTxTypeFilter] = useState('all');
+    const [historyExpanded, setHistoryExpanded] = useState(false);
     const [customFrom, setCustomFrom] = useState(() => {
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
@@ -9284,6 +9297,8 @@ function App() {
       if (txTypeFilter !== 'all' && tx.type !== txTypeFilter) return false;
       return true;
     });
+    const historyLimit = historyExpanded ? historyTxs.length : 12;
+    const hiddenHistoryCount = Math.max(0, historyTxs.length - historyLimit);
 
     // Safe quick-pay: only pays the exact outstanding debt (not arbitrary amount)
     const quickPay = studentId => {
@@ -9964,7 +9979,7 @@ function App() {
         })]
       }), _jsx("div", {
         className: "finance-history-list",
-        children: historyTxs.slice(0, 12).map(tx => {
+        children: historyTxs.slice(0, historyLimit).map(tx => {
         const s = students.find(st => sameId(st.id, tx.studentId));
         const meta = getTxMeta(tx);
         return _jsxs("div", {
@@ -9974,7 +9989,7 @@ function App() {
             alignItems: 'center',
             gap: 8,
             padding: '10px 0',
-            borderBottom: '1.5px solid #e0e0e0'
+            borderBottom: '1.5px solid var(--border-light)'
           },
           children: [_jsxs("div", {
             children: [_jsx("div", {
@@ -9986,7 +10001,7 @@ function App() {
             }), _jsxs("div", {
               style: {
                 fontSize: 10,
-                color: '#888'
+                color: 'var(--text-sec)'
               },
               children: [fmtDate(tx.date), " \xB7 ", meta.source, tx.comment ? ` · ${tx.comment}` : '']
             })]
@@ -10042,9 +10057,11 @@ function App() {
           })]
         }, tx.id);
       })
-      }), historyTxs.length > 12 && _jsxs("div", {
-        className: "finance-history-more metric-sub",
-        children: ["\u0415\u0449\u0435 ", historyTxs.length - 12, " \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0439"]
+      }), historyTxs.length > 12 && _jsxs("button", {
+        type: "button",
+        className: "btn btn-sm btn-white finance-history-more",
+        onClick: () => setHistoryExpanded(v => !v),
+        children: historyExpanded ? "\u0421\u0432\u0435\u0440\u043D\u0443\u0442\u044C \u0436\u0443\u0440\u043D\u0430\u043B" : ["\u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C \u0435\u0449\u0435 ", hiddenHistoryCount]
       }), _jsxs("div", {
         style: {
           display: 'grid',

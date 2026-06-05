@@ -4744,10 +4744,10 @@ body[data-theme="dark"] .mobile-agenda-card.individual.status-completed {
 }
 @media(min-width:769px) {
   .lesson-card:not(:hover) .lesson-actions button:not(:first-child) {
-    opacity: .28;
+    opacity: .48;
   }
   .lesson-card:hover .lesson-actions button:not(:first-child) {
-    opacity: .82;
+    opacity: .9;
   }
 }
 .lesson-tag {
@@ -4846,23 +4846,56 @@ body[data-theme="dark"] .today-upcoming {
 /* COMMERCIAL LAYOUT PASS: readable desktop, real tablet range, shorter finance control */
 @media(min-width:1025px) {
   .today-page {
-    max-width: 980px;
+    max-width: 1120px;
     margin-left: auto;
     margin-right: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+    gap: 16px;
+    align-items: start;
   }
-  .today-page > div[style*="justify-content: space-between"],
-  .today-command-panel,
-  .today-close-card,
-  .today-upcoming,
-  .today-page > .card {
-    max-width: 920px;
-    margin-left: auto;
-    margin-right: auto;
+  .today-page > .timer-banner,
+  .today-hero,
+  .today-page > .empty-state {
+    grid-column: 1 / -1;
+    width: 100%;
   }
-  .today-page .lesson-card {
-    max-width: 920px;
-    margin-left: auto;
-    margin-right: auto;
+  .today-command-panel {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+  .today-close-card {
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+  .today-lessons-head {
+    grid-column: 1;
+    grid-row: 3;
+    width: 100%;
+  }
+  .today-page > .lesson-card {
+    grid-column: 1;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .today-page > .card:not(.today-close-card) {
+    grid-column: 1;
+    width: 100%;
+  }
+  .today-upcoming {
+    grid-column: 2;
+    grid-row: 3 / span 8;
+    width: 100%;
+    max-width: none;
+    margin: 0;
   }
   .today-page .lesson-body {
     padding: 14px 18px;
@@ -4873,6 +4906,10 @@ body[data-theme="dark"] .today-upcoming {
   }
   .today-page .lesson-actions {
     padding-right: 14px;
+  }
+  .today-upcoming .lesson-card.compact {
+    width: 100%;
+    max-width: none;
   }
   .desktop-selected-day-panel {
     max-width: 980px;
@@ -4981,12 +5018,293 @@ body[data-theme="dark"] .today-upcoming {
   margin-top: 10px;
 }
 @media(max-width:768px) {
+  .mobile-agenda-card,
+  .lesson-card {
+    border-radius: 8px;
+  }
+  .mobile-agenda-title {
+    gap: 8px;
+  }
+  .mobile-agenda-title span {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+  }
+  .mobile-agenda-title em {
+    padding-top: 2px;
+  }
+  .mobile-agenda-meta {
+    gap: 5px;
+    row-gap: 4px;
+  }
+  .mobile-agenda-actions {
+    gap: 8px;
+  }
+  .mobile-agenda-icon {
+    min-width: 34px;
+    min-height: 34px;
+  }
+  .finance-page .crm-dashboard {
+    gap: 9px;
+  }
+  .finance-history-more {
+    min-height: 42px;
+  }
   .finance-history-list {
     max-height: 520px;
     overflow-y: auto;
     padding-right: 2px;
     border-top: 1.5px solid var(--border-light);
     border-bottom: 1.5px solid var(--border-light);
+  }
+}
+
+/* COMMERCIAL RELEASE POLISH: remove tablet compromises, tighten mobile flows */
+@media(min-width:769px) and (max-width:899px) {
+  .main {
+    width: min(760px, calc(100vw - 32px));
+    max-width: 760px;
+    padding-top: 72px;
+  }
+  .sched-desktop {
+    display: none;
+  }
+  .sched-mobile {
+    display: block;
+  }
+  .desktop-selected-day-panel {
+    display: none;
+  }
+  .mobile-week-shell {
+    max-width: 720px;
+    margin: 0 auto;
+    gap: 12px;
+  }
+  .mobile-week-strip {
+    position: static;
+    gap: 8px;
+    padding: 0 0 12px;
+    background: transparent;
+  }
+  .mobile-week-strip-day {
+    height: 78px;
+    border-radius: 12px;
+    padding: 7px 4px;
+    box-shadow: var(--shadow-soft);
+  }
+  .mobile-week-strip-day span {
+    font-size: 10px;
+  }
+  .mobile-week-strip-day strong {
+    font-size: 24px;
+  }
+  .mobile-week-strip-day em {
+    min-width: 26px;
+    height: 21px;
+    font-size: 10px;
+  }
+  .mobile-week-strip-day small {
+    font-size: 8px;
+  }
+  .mobile-selected-day {
+    border-radius: 14px;
+  }
+  .mobile-selected-head {
+    padding: 14px 16px;
+  }
+  .mobile-selected-head strong {
+    font-size: 20px;
+  }
+  .mobile-selected-head span,
+  .mobile-selected-summary b {
+    font-size: 10px;
+  }
+  .mobile-selected-summary button {
+    width: 42px;
+    height: 42px;
+  }
+  .mobile-agenda-list {
+    gap: 10px;
+    padding: 14px;
+  }
+  .mobile-agenda-card {
+    grid-template-columns: 74px minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+  }
+  .mobile-agenda-time {
+    width: 74px;
+    height: 56px;
+    font-size: 16px;
+  }
+  .mobile-agenda-title {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+  .mobile-agenda-meta span {
+    font-size: 10px;
+    padding: 2px 7px;
+  }
+  .mobile-agenda-actions {
+    grid-column: 3;
+    grid-row: 1;
+    grid-template-columns: repeat(4, 36px);
+    align-self: center;
+    justify-content: end;
+    margin-top: 0;
+  }
+  .mobile-agenda-main,
+  .mobile-agenda-icon {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media(max-width:768px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 10px 8px max(10px, env(safe-area-inset-bottom));
+  }
+  .modal {
+    width: 100%;
+    max-width: 560px;
+    max-height: min(86dvh, calc(100dvh - 24px));
+    border-radius: 14px 14px 0 0;
+  }
+  .modal-head {
+    padding: 12px 14px 10px;
+  }
+  .modal-title {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+  .modal-close {
+    width: 34px;
+    height: 34px;
+  }
+  .modal > form,
+  .modal > .empty-state,
+  .modal > .card,
+  .modal > .detail-tabs,
+  .modal > div:not(.modal-head),
+  .modal > form + * {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+  .modal > form {
+    padding: 12px 0 14px;
+    gap: 10px;
+  }
+  .modal .toggle-row {
+    margin-bottom: 10px;
+  }
+  .form-field {
+    gap: 5px;
+  }
+  .label {
+    font-size: 9px;
+  }
+  .input {
+    min-height: 42px;
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+  textarea.input {
+    min-height: 74px;
+  }
+  .modal-actions {
+    gap: 8px;
+    padding-top: 8px;
+  }
+  .modal-actions .btn,
+  .modal-actions button {
+    min-height: 42px;
+  }
+}
+
+@media(max-width:520px) {
+  .finance-page .toggle-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-light);
+    background: color-mix(in srgb, var(--surface) 88%, var(--white));
+    box-shadow: none;
+  }
+  .finance-page .toggle-opt {
+    min-height: 38px;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 4px;
+    font-size: 9px;
+    line-height: 1.1;
+  }
+  .finance-page .toggle-opt.active {
+    box-shadow: none;
+  }
+  .finance-page .crm-dashboard {
+    gap: 10px;
+  }
+  .finance-page .metric-card,
+  .finance-insight-card,
+  .finance-panel {
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+  }
+  .finance-page .metric-card {
+    min-height: 110px;
+    padding: 13px;
+  }
+  .finance-section-title {
+    margin-top: 14px;
+  }
+}
+
+@media(max-width:640px) {
+  .parent-public-page {
+    padding: 14px;
+    background:
+      radial-gradient(circle at 18% -8%, color-mix(in srgb, var(--yellow) 18%, transparent), transparent 34%),
+      var(--white);
+  }
+  .parent-public-shell {
+    gap: 12px;
+  }
+  .parent-public-hero,
+  .parent-dashboard,
+  .parent-public-section {
+    border-radius: 14px;
+    box-shadow: var(--shadow-soft);
+  }
+  .parent-public-hero {
+    padding: 18px;
+  }
+  .parent-public-hero h1 {
+    font-size: clamp(32px, 11vw, 42px);
+  }
+  .parent-public-hero p,
+  .parent-dashboard-head p {
+    font-size: 13px;
+  }
+  .parent-dashboard {
+    padding: 14px;
+  }
+  .parent-kpi-card,
+  .parent-chart-card,
+  .parent-public-row,
+  .parent-homework-card,
+  .parent-progress-row {
+    border-radius: 12px;
+    box-shadow: none;
+  }
+  .parent-kpi-grid,
+  .parent-chart-grid {
+    gap: 10px;
   }
 }
 
